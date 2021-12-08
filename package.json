@@ -1,0 +1,25 @@
+{
+  "name": "@windingtree/org.id-profile-manager-monorepo",
+  "description": "An ORGiD organization profile Dapp and services",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "bootstrap": "npx lerna bootstrap && npx lerna link",
+    "lint": "npx lerna run lint",
+    "build": "npx lerna run build",
+    "test": "npx lerna run test",
+    "exec": "lerna exec"
+  },
+  "repository": "git@github.com:windingtree/org.id-profile-manager.git",
+  "author": "Winding Tree Developers <dev@windingtree.com>",
+  "contributors": [
+    "Kostiantyn Smyrnov <kostysh@gmail.com>"
+  ],
+  "bugs": {
+    "url": "https://github.com/windingtree/org.id-profile-manager/issues"
+  },
+  "homepage": "https://github.com/windingtree/org.id-profile-manager#readme",
+  "devDependencies": {
+    "lerna": "4.0.0"
+  }
+}

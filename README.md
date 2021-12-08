@@ -1,2 +1,2 @@
-# org.id-profile
+# org.id-profile-manager
 An ORGiD organization profile Dapp
