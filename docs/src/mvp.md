@@ -68,10 +68,17 @@ sequenceDiagram
   end
 ```
 
+![Sing-In Pop-up](../assets/wf/signin.png)
+
+![Sing-In Pop-up](../assets/wf/main-page.png)
+
+![Sing-In Pop-up](../assets/wf/main-menu.png)
+
 ## Dapp configuration
 
 ### Storage options
 
+The Dapp will store all the information that created with the profile manager locally. Files that are related to the organization profiles will be stored using the configured external storage option (files storage).
 #### Configuration storage
 
 - Web browser `LocalStorage`
@@ -109,30 +116,62 @@ To make it possible to generate a UI from the JSON schema the schema must be ext
 
 The MVP version of the profile UI will have a **vertical layout only**. The next version will have a custom UI schema that will be integrated into the ORG.JSON schema package.
 
-### Adding of verification methods
+![Sing-In Pop-up](../assets/wf/edit-profile.png)
 
-#### Default verification method
+## Saving of a profile
 
-The default verification method is belonging to the current organization owner. The public key of this method must be tagged as `ownerKey_1`.
+A customer saves a profile using a selected storage method. After the profile is saved the Dapp must compare the URIs of the saved profile with the link stored in the smart contract. If URIs are different the Dapp must propose to a customer to update the stored link by sending a transaction to the smart contract.
 
-#### ORGiD Delegates
+## Keys
 
-If the selected organization has configured delegated verification methods these methods will be displayed as a form with fields. Each field will contain one verification method that can be edited.
+New keys can be generated right in the Dapp or created externally and imported into the Dapp.
 
-> The feature of adding verification method delegates is not accessible if ORGiD is not registered yet.
+Imported keys must be marked in the UI as `imported`.
 
-##### Adding of delegated verification method
+Imported keys can be imported without a `private` part, but just as a `public` key. In that case, the key must be marked in the UI as `public only`.
+
+To generate a new key pair a customer has to use an interface `Generate key pair`. Before the generation starts a customer must be requested about a special pin code that will be used for private key encryption.
+
+The encrypted private key will be stored in local storage. A customer will have the ability to export a key at any time but he should provide the pin code that has been set during key generation.
+
+All keys must have a unique tag.
+
+![Sing-In Pop-up](../assets/wf/keys-page.png)
+## Verification methods
+
+Verification methods can be created on the basis of keys that are generated or imported in the Dapp.
+
+> If the Dapp has no added keys a customer must be properly notified and informed about keys.
 
 To add new methods the customer must press the `add method` button then fill the field.
 
 To save a new verification method a customer must send a transaction to the smart contract.
 
-> If a customer updated the verification methods list but has not sent a transaction the Dapp must show to him a proper notification.
+> If a customer added/updated the verification method but has not sent a transaction the Dapp must show to him a proper notification.
 
-### Saving of the profile
+### Default verification method
 
-A customer saves a profile using a selected storage method. After the profile is saved the Dapp must compare the URIs of the saved profile with the link stored in the smart contract. If URIs are different the Dapp must propose to a customer to update the stored link by sending a transaction to the smart contract.
+The default verification method is belonging to the current organization owner. This method must be tagged as `ownerKey_1`. This method should be created automatically during the organization profile initialization.
+
+### ORGiD Delegates
+
+If the selected organization has enabled (registered in the smart contract) delegated verification methods these methods will be displayed as a form with fields. Each field will contain one verification method that can be edited or removed.
+
+> The feature of adding verification method delegates must not be accessible if ORGiD is not registered yet.
+
+The MVP Dapp will support `internal` delegates only.
+
+![Sing-In Pop-up](../assets/wf/delegates-page.png)
 
 ## Creation of an ORGiD
 
 The feature of an ORGiD creation is not accessible until the profile is saved.
+
+Before an ORGiD creation, a customer can edit an automatically generated `salt` (bytes32 hash string). This hash will be permanently stored in the Dapp storage and cannot be changed after an ORGiD creation. The UI for the `salt` editing will be placed on the Dapp configuration page.
+
+This `salt` is stored just for a note because this parameter is used for an ORGiD generation.
+
+If an ORGiD is created manually outside the Dapp, the `salt` can be added to the Dapp configuration manually.
+
+To create an ORGiD a customer must send a transaction to the smart contract.
+
