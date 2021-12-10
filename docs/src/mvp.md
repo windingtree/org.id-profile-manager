@@ -95,6 +95,14 @@ The Dapp will store all the information that created with the profile manager lo
 > The Infura IPFS API does not support IPNS. So stored files cannot be updated and every new deployment will generate a new CID.<br>
 > If a customer will choose this storage option the Dapp must show a notification to the customer that he had to send a transaction to the smart contract to update a link to the ORG.JSON.
 
+#### Storage configuration workflow
+
+> TBD
+
+#### Backup workflow
+
+> TBD
+
 ## Organization profiles
 
 When a customer sign in the Dapp fetches owned organization profiles from the smart contract and shows a simple list of cards labelled with organization name and logotype.
@@ -118,9 +126,13 @@ The MVP version of the profile UI will have a **vertical layout only**. The next
 
 ![Sing-In Pop-up](../assets/wf/edit-profile.png)
 
-## Saving of a profile
+### Saving of a profile
 
 A customer saves a profile using a selected storage method. After the profile is saved the Dapp must compare the URIs of the saved profile with the link stored in the smart contract. If URIs are different the Dapp must propose to a customer to update the stored link by sending a transaction to the smart contract.
+
+### Profile management workflow
+
+> TBD
 
 ## Keys
 
@@ -137,7 +149,7 @@ The encrypted private key will be stored in local storage. A customer will have 
 All keys must have a unique tag.
 
 ![Sing-In Pop-up](../assets/wf/keys-page.png)
-## Verification methods
+### Verification methods
 
 Verification methods can be created on the basis of keys that are generated or imported in the Dapp.
 
@@ -153,7 +165,11 @@ To save a new verification method a customer must send a transaction to the smar
 
 The default verification method is belonging to the current organization owner. This method must be tagged as `ownerKey_1`. This method should be created automatically during the organization profile initialization.
 
-### ORGiD Delegates
+### Keys and verification methods workflow
+
+> TBD
+
+## ORGiD Delegates
 
 If the selected organization has enabled (registered in the smart contract) delegated verification methods these methods will be displayed as a form with fields. Each field will contain one verification method that can be edited or removed.
 
@@ -162,6 +178,10 @@ If the selected organization has enabled (registered in the smart contract) dele
 The MVP Dapp will support `internal` delegates only.
 
 ![Sing-In Pop-up](../assets/wf/delegates-page.png)
+
+### ORGiD capability delegation workflow
+
+> TBD
 
 ## Creation of an ORGiD
 
