@@ -1,8 +1,14 @@
+import { AppStateProvider } from './store';
+
+// Pages
 import { Main } from './pages/Main';
 
 const App = () => {
+
   return (
-    <Main />
+    <AppStateProvider>
+      <Main />
+    </AppStateProvider>
   );
 }
 
