@@ -36,6 +36,7 @@ export const useWeb3Modal = (web3ModalConfig: Web3ModalConfig): Web3ModalHook =>
   const signOut = useCallback(() => {
     web3Modal.clearCachedProvider();
     setProvider(undefined);
+    // SignOut issue when using walletconnect: https://github.com/Web3Modal/web3modal/issues/354
     logger.info(`Logged Out`);
     window.location.reload();
   }, [web3Modal]);
@@ -79,8 +80,13 @@ export const useWeb3Modal = (web3ModalConfig: Web3ModalConfig): Web3ModalHook =>
       logger.info(`Logged In`);
     } catch (error) {
       setIsConnecting(false);
-      logger.error(error);
-      setError((error as Error).message);
+
+      if (error) {
+        logger.error(error);
+        setError((error as Error).message);
+      } else {
+        logger.error('Unknown error');
+      }
     }
   }, [web3Modal, signOut]);
 

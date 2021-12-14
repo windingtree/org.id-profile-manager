@@ -33,9 +33,14 @@ export const useAccount = (
         setAccount(accounts[0]);
         setLoading(false);
       } catch (error) {
-        logger.error(error);
         setLoading(false);
-        setError((error as Error).message);
+
+        if (error) {
+          logger.error(error);
+          setError((error as Error).message);
+        } else {
+          logger.error('Unknown error');
+        }
       }
     };
 

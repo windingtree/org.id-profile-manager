@@ -1,15 +1,16 @@
 import { useAppState } from '../../store';
+import { Button } from './index';
 
 export const SignInButton = () => {
   const { isConnecting, signIn } = useAppState();
 
   return (
-    <button
+    <Button
       onClick={() => signIn()}
       disabled={isConnecting}
     >
       Sign-In{isConnecting ? '...' : ''}
-    </button>
+    </Button>
   )
 };
 
@@ -17,11 +18,11 @@ export const SignOutButton = () => {
   const { isConnecting, signOut } = useAppState();
 
   return (
-    <button
+    <Button
       onClick={() => signOut()}
       disabled={isConnecting}
     >
       Sign-Out{isConnecting ? '...' : ''}
-    </button>
+    </Button>
   )
 };

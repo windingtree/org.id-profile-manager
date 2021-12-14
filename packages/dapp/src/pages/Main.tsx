@@ -1,5 +1,6 @@
 import { useAppState } from '../store';
 import { SignInButton, SignOutButton } from '../components/buttons/web3Modal';
+import { Account } from '../components/Account';
 
 // Config
 import { getNetworksNames } from '../config';
@@ -11,7 +12,10 @@ export const Main = () => {
 
   return (
     <div>
-      <div>Main [{account}]</div>
+      <div>Main</div>
+      <div>
+        <Account account={account} />
+      </div>
       <div>
         {
           account

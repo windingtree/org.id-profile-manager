@@ -51,11 +51,16 @@ export const useNetworkId = (
           setIsRightNetwork(false);
         }
       } catch (error) {
-        logger.error(error);
         setIsLoading(false);
         setNetworkId(undefined);
         setIsRightNetwork(false);
-        setError((error as Error).message);
+
+        if (error) {
+          logger.error(error);
+          setError((error as Error).message);
+        } else {
+          logger.error('Unknown error');
+        }
       }
     };
 
