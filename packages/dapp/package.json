@@ -57,7 +57,10 @@
     "web-vitals": "2.1.4",
     "web3modal": "1.9.5",
     "react-blockies": "1.4.1",
-    "react-refresh": "0.11.0"
+    "react-refresh": "0.11.0",
+    "grommet": "^2.20.0",
+    "grommet-icons": "^4.7.0",
+    "grommet-theme-hpe": "^2.3.0"
   },
   "resolutions": {
     "babel-loader": "8.1.0"

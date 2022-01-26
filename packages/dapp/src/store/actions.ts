@@ -1,5 +1,7 @@
 import type { Web3ModalProvider } from '../hooks/useWeb3Modal';
 import type { IProviderInfo } from 'web3modal';
+import type { ThemeType } from 'grommet/themes';
+import { ThemeMode } from '../hooks/useStyle';
 
 export interface SetConnectingAction {
   type: 'SET_CONNECTING',
@@ -54,12 +56,30 @@ export interface RemoveAllErrorsAction {
   payload: number;
 }
 
+export interface SetThemeAction {
+  type: 'SET_THEME';
+  payload: ThemeType;
+}
+
+export interface SetThemeModeAction {
+  type: 'SET_THEME_MODE';
+  payload: ThemeMode;
+}
+
+export interface SetSwitchThemeModeAction {
+  type: 'SET_SWITCH_THEME_MODE';
+  payload: Function;
+}
+
 export type Action =
 | SetConnectingAction
 | SetAccountAction
 | SetIsRightNetworkAction
 | SetNetworkIdAction
 | SetProviderAction
+| SetThemeAction
+| SetThemeModeAction
+| SetSwitchThemeModeAction
 | SetInjectedProviderAction
 | SetWeb3modalFunctionsAction
 | AddErrorAction

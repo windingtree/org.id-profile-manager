@@ -9,6 +9,7 @@ import { useAppReducer } from './reducer';
 import { useWeb3Modal } from '../hooks/useWeb3Modal';
 import { useNetworkId } from '../hooks/useNetworkId';
 import { useAccount } from '../hooks/useAccount';
+import { useStyle } from '../hooks/useStyle';
 
 // Config
 import {
@@ -85,6 +86,7 @@ export const AppStateProvider = ({ children }: PropsType) => {
     networkError
   ] = useNetworkId(provider, allowedNetworksIds);
   const [account, isAccountLoading, accountError] = useAccount(provider);
+  const [theme, themeMode, switchThemeMode] = useStyle();
 
   useEffect(() => {
     if (web3ModalError) {
@@ -158,6 +160,27 @@ export const AppStateProvider = ({ children }: PropsType) => {
       }
     })
   }, [dispatch, signIn, signOut]);
+
+  useEffect(() => {
+    dispatch({
+      type: 'SET_THEME',
+      payload: theme
+    })
+  }, [dispatch, theme]);
+
+  useEffect(() => {
+    dispatch({
+      type: 'SET_THEME_MODE',
+      payload: themeMode
+    })
+  }, [dispatch, themeMode]);
+
+  useEffect(() => {
+    dispatch({
+      type: 'SET_SWITCH_THEME_MODE',
+      payload: switchThemeMode
+    })
+  }, [dispatch, switchThemeMode]);
 
   return (
     <StateContext.Provider value={state}>

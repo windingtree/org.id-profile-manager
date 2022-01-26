@@ -1,18 +1,12 @@
 import { StrictMode } from 'react';
 import { render } from 'react-dom';
 import reportWebVitals from './reportWebVitals';
-import { createGlobalStyle } from 'styled-components';
-import { globalStyle } from './styles';
 import App from './App';
-
-const GlobalStyle = createGlobalStyle`
-  ${globalStyle}
-`;
+import './reset.css';
 
 const renderApp = () => {
   render(
     <StrictMode>
-      <GlobalStyle />
       <App />
     </StrictMode>,
     document.getElementById('root')

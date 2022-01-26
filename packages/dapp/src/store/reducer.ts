@@ -1,8 +1,10 @@
 import type { Web3ModalProvider } from '../hooks/useWeb3Modal';
 import type { IProviderInfo } from 'web3modal';
 import type { Action } from './actions';
+import type { ThemeType } from 'grommet/themes';
 import { useReducer } from 'react';
 import Logger from '../utils/logger';
+import { ThemeMode } from '../hooks/useStyle';
 
 // Initialize logger
 const logger = Logger('Reducer');
@@ -17,6 +19,9 @@ export interface State {
   signIn: Function;
   signOut: Function;
   errors: string[];
+  theme?: ThemeType;
+  themeMode: ThemeMode; 
+  switchThemeMode: Function;
 }
 
 export const reducer = (state: State, action: Action): State => {
@@ -37,6 +42,21 @@ export const reducer = (state: State, action: Action): State => {
       return {
         ...state,
         isRightNetwork: action.payload
+      };
+    case 'SET_THEME':
+      return {
+        ...state,
+        theme: action.payload
+      };
+    case 'SET_THEME_MODE':
+      return {
+        ...state,
+        themeMode: action.payload
+      };
+    case 'SET_SWITCH_THEME_MODE':
+      return {
+        ...state,
+        switchThemeMode: action.payload
       };
     case 'SET_NETWORK_ID':
       return {
@@ -87,7 +107,9 @@ const initialState: State = {
   isRightNetwork: true,
   signIn: () => {},
   signOut: () => {},
-  errors: []
+  errors: [],
+  themeMode:ThemeMode.light,
+  switchThemeMode: () => {}
 };
 
 export const useAppReducer = () => useReducer(reducer, initialState);
