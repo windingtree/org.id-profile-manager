@@ -10,37 +10,42 @@ export const usePoller = (
   fn: Function,
   delay: number | null,
   enabled = true,
-  name = ' '
+  name = ' ',
+  maxFailures = 100
 ): void => {
 
   useEffect(() => {
-    let isFnDone = true;
+    let failures = 0;
 
-    const fnRunner = async () => {
-      if (isFnDone) {
+    const fnRunner = async (): Promise<void> => {
+      try {
         const context = fn();
 
         if (typeof context.then === 'function') {
-          isFnDone = false;
           await context;
-          isFnDone = true;
         }
-
-        isFnDone = true;
+      } catch (error) {
+        failures++;
+        logger.error(
+          `Poller ${name} error: ${(error as Error).message || 'Unknown error'}`
+        );
       }
     };
 
-    if (enabled && delay) {
-      // @todo add promise watcher
-      const id1 = setInterval(fnRunner, delay);
-      const id0 = setTimeout(fnRunner);
+    const poller = async (): Promise<void> => {
       logger.debug(`Poller ${name} started`);
 
-      return () => {
-        clearTimeout(id0);
-        clearInterval(id1);
-        logger.debug(`Poller ${name} stopped`);
-      };
-    }
-  }, [fn, delay, name, enabled]);
+      while (enabled && delay && failures < maxFailures) {
+        await fnRunner();
+        await new Promise(resolve => setTimeout(resolve, delay));
+      }
+    };
+
+    const runnerTimeout = setTimeout(() => poller());
+
+    return () => {
+      clearTimeout(runnerTimeout);
+      logger.debug(`Poller ${name} stopped`);
+    };
+  }, [fn, delay, name, enabled, maxFailures]);
 };
