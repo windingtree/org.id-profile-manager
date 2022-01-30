@@ -1,5 +1,4 @@
 import { useEffect } from 'react';
-
 import Logger from '../utils/logger';
 
 // Initialize logger
@@ -32,19 +31,27 @@ export const usePoller = (
       }
     };
 
+    const isEnabled = () => enabled && delay && failures < maxFailures;
+
     const poller = async (): Promise<void> => {
       logger.debug(`Poller ${name} started`);
 
-      while (enabled && delay && failures < maxFailures) {
+      while (isEnabled()) {
         await fnRunner();
-        await new Promise(resolve => setTimeout(resolve, delay));
+        await new Promise(
+          resolve => setTimeout(resolve, delay !== null ? delay : 0)
+        );
       }
     };
 
-    const runnerTimeout = setTimeout(() => poller());
+    let runnerTimeout: NodeJS.Timeout | undefined;
+
+    if (isEnabled()) {
+      runnerTimeout = setTimeout(poller);
+    }
 
     return () => {
-      clearTimeout(runnerTimeout);
+      clearTimeout(runnerTimeout as NodeJS.Timeout);
       logger.debug(`Poller ${name} stopped`);
     };
   }, [fn, delay, name, enabled, maxFailures]);
