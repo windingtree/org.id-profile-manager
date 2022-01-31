@@ -1,9 +1,5 @@
-import { createGlobalStyle } from 'styled-components';
-import { globalStyle } from '../src/styles';
-
-const GlobalStyle = createGlobalStyle`
-  ${globalStyle}
-`;
+import { Grommet } from 'grommet';
+import { useStyle } from '../src/hooks/useStyle';
 
 export const parameters = {
   actions: { argTypesRegex: "^on[A-Z].*" },
@@ -16,10 +12,13 @@ export const parameters = {
 };
 
 export const decorators = [
-  Story => (
-    <>
-      <GlobalStyle />
-      <Story />
+  Story => {
+    const [theme, themeMode] = useStyle();
+
+    return  <>
+      <Grommet theme={theme} themeMode={themeMode}>
+        <Story />
+      </Grommet>
     </>
-  ),
+  },
 ];

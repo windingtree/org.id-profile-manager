@@ -1,5 +1,11 @@
+import { Button, Box, Spinner, Text } from 'grommet';
+import styled from 'styled-components';
+
 import { useAppState } from '../../store';
-import { Button } from './index';
+
+const ButtonLabel = styled(Text)`
+  margin: 8px;
+`;
 
 export const SignInButton = () => {
   const { isConnecting, signIn } = useAppState();
@@ -9,7 +15,10 @@ export const SignInButton = () => {
       onClick={() => signIn()}
       disabled={isConnecting}
     >
-      Sign-In{isConnecting ? '...' : ''}
+      {() => (<Box direction="row" align="center">
+        <ButtonLabel>Sign-In</ButtonLabel>
+        {isConnecting ? <Spinner /> : ''}
+      </Box>)}
     </Button>
   )
 };
@@ -22,7 +31,10 @@ export const SignOutButton = () => {
       onClick={() => signOut()}
       disabled={isConnecting}
     >
-      Sign-Out{isConnecting ? '...' : ''}
+      {() => (<Box direction="row" align="center">
+        <ButtonLabel>Sign-Out</ButtonLabel>
+        {isConnecting ? <Spinner /> : ''}
+      </Box>)}
     </Button>
   )
 };
