@@ -24,11 +24,15 @@ export const SignInButton = () => {
 };
 
 export const SignOutButton = () => {
-  const { isConnecting, signOut } = useAppState();
+  const { isConnecting, signOut, switchEncryptionAccount, switchEncryptionKey } = useAppState();
 
   return (
     <Button
-      onClick={() => signOut()}
+      onClick={() => {
+        signOut();
+        switchEncryptionAccount('');
+        switchEncryptionKey('');
+      }}
       disabled={isConnecting}
     >
       {() => (<Box direction="row" align="center">

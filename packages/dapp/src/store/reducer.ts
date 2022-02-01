@@ -1,10 +1,11 @@
-import type { Web3ModalProvider } from '../hooks/useWeb3Modal';
-import type { IProviderInfo } from 'web3modal';
-import type { Action } from './actions';
-import type { ThemeType } from 'grommet/themes';
-import { useReducer } from 'react';
+import type {Web3ModalProvider} from '../hooks/useWeb3Modal';
+import type {IProviderInfo} from 'web3modal';
+import type {Action} from './actions';
+import type {ThemeType} from 'grommet/themes';
+import {useReducer} from 'react';
 import Logger from '../utils/logger';
-import { ThemeMode } from '../hooks/useStyle';
+import {ThemeMode} from '../hooks/useStyle';
+import {CurrentPage} from '../hooks/usePageNav';
 
 // Initialize logger
 const logger = Logger('Reducer');
@@ -20,8 +21,16 @@ export interface State {
   signOut: Function;
   errors: string[];
   theme?: ThemeType;
-  themeMode: ThemeMode; 
+  themeMode: ThemeMode;
   switchThemeMode: Function;
+  currentPage: CurrentPage;
+  switchCurrentPage: Function;
+  encryptionAccount: string;
+  switchEncryptionAccount: Function;
+  encryptionKey: string;
+  switchEncryptionKey: Function;
+  dappConfig: string;
+  switchDappConfig: Function;
 }
 
 export const reducer = (state: State, action: Action): State => {
@@ -57,6 +66,46 @@ export const reducer = (state: State, action: Action): State => {
       return {
         ...state,
         switchThemeMode: action.payload
+      };
+    case 'SET_CURRENT_PAGE':
+      return {
+        ...state,
+        currentPage: action.payload
+      }
+    case 'SET_SWITCH_CURRENT_PAGE':
+      return {
+        ...state,
+        switchCurrentPage: action.payload
+      };
+    case 'SET_ENCRYPTION_ACCOUNT':
+      return {
+        ...state,
+        encryptionAccount: action.payload
+      }
+    case 'SET_SWITCH_ENCRYPTION_ACCOUNT':
+      return {
+        ...state,
+        switchEncryptionAccount: action.payload
+      };
+    case 'SET_ENCRYPTION_KEY':
+      return {
+        ...state,
+        encryptionKey: action.payload
+      }
+    case 'SET_SWITCH_ENCRYPTION_KEY':
+      return {
+        ...state,
+        switchEncryptionKey: action.payload
+      };
+    case 'SET_DAPP_CONFIG':
+      return {
+        ...state,
+        dappConfig: action.payload
+      }
+    case 'SET_SWITCH_DAPP_CONFIG':
+      return {
+        ...state,
+        switchDappConfig: action.payload
       };
     case 'SET_NETWORK_ID':
       return {
@@ -109,7 +158,15 @@ const initialState: State = {
   signOut: () => {},
   errors: [],
   themeMode:ThemeMode.light,
-  switchThemeMode: () => {}
+  switchThemeMode: () => {},
+  currentPage: CurrentPage.home,
+  switchCurrentPage: () => {},
+  encryptionAccount: "",
+  switchEncryptionAccount: () => {},
+  encryptionKey: "",
+  switchEncryptionKey: () => {},
+  dappConfig: "",
+  switchDappConfig: () => {},
 };
 
 export const useAppReducer = () => useReducer(reducer, initialState);
