@@ -13,7 +13,7 @@
     "lint:fix": "npx eslint . --ext .ts --fix",
     "build": "rm -rf dist && npx tsc -p tsconfig-build.json",
     "test": "npx mocha --timeout 70000 --require ts-node/register",
-    "test:coverage": "npx nyc --reporter=html --reporter=lcov mocha --timeout 70000 -r ts-node/register --extension spec.ts"
+    "test:coverage": "npx nyc --reporter=html --reporter=lcov mocha --timeout 70000 --require ts-node/register"
   },
   "keywords": [
     "orgid",
