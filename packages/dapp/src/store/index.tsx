@@ -10,6 +10,10 @@ import { useWeb3Modal } from '../hooks/useWeb3Modal';
 import { useNetworkId } from '../hooks/useNetworkId';
 import { useAccount } from '../hooks/useAccount';
 import { useStyle } from '../hooks/useStyle';
+import { usePageNav } from '../hooks/usePageNav';
+import { useEncryptionAccount } from '../hooks/useEncryptionAccount';
+import { useEncryptionKey } from '../hooks/useEncryptionKey';
+import { useDappConfig } from '../hooks/useDappConfig';
 
 // Config
 import {
@@ -87,6 +91,10 @@ export const AppStateProvider = ({ children }: PropsType) => {
   ] = useNetworkId(provider, allowedNetworksIds);
   const [account, isAccountLoading, accountError] = useAccount(provider);
   const [theme, themeMode, switchThemeMode] = useStyle();
+  const [currentPage, switchCurrentPage] = usePageNav();
+  const [encryptionAccount, switchEncryptionAccount] = useEncryptionAccount();
+  const [encryptionKey, switchEncryptionKey] = useEncryptionKey();
+  const [dappConfig, switchDappConfig] = useDappConfig();
 
   useEffect(() => {
     if (web3ModalError) {
@@ -181,6 +189,62 @@ export const AppStateProvider = ({ children }: PropsType) => {
       payload: switchThemeMode
     })
   }, [dispatch, switchThemeMode]);
+
+  useEffect(() => {
+    dispatch({
+      type: 'SET_CURRENT_PAGE',
+      payload: currentPage
+    })
+  }, [dispatch, currentPage]);
+
+  useEffect(() => {
+    dispatch({
+      type: 'SET_SWITCH_CURRENT_PAGE',
+      payload: switchCurrentPage
+    })
+  }, [dispatch, switchCurrentPage]);
+
+  useEffect(() => {
+    dispatch({
+      type: 'SET_ENCRYPTION_ACCOUNT',
+      payload: encryptionAccount
+    })
+  }, [dispatch, encryptionAccount]);
+
+  useEffect(() => {
+    dispatch({
+      type: 'SET_SWITCH_ENCRYPTION_ACCOUNT',
+      payload: switchEncryptionAccount
+    })
+  }, [dispatch, switchEncryptionAccount]);
+
+  useEffect(() => {
+    dispatch({
+      type: 'SET_ENCRYPTION_KEY',
+      payload: encryptionKey
+    })
+  }, [dispatch, encryptionKey]);
+
+  useEffect(() => {
+    dispatch({
+      type: 'SET_SWITCH_ENCRYPTION_KEY',
+      payload: switchEncryptionKey
+    })
+  }, [dispatch, switchEncryptionKey]);
+
+  useEffect(() => {
+    dispatch({
+      type: 'SET_DAPP_CONFIG',
+      payload: dappConfig
+    })
+  }, [dispatch, dappConfig]);
+
+  useEffect(() => {
+    dispatch({
+      type: 'SET_SWITCH_DAPP_CONFIG',
+      payload: switchDappConfig
+    })
+  }, [dispatch, switchDappConfig]);
 
   return (
     <StateContext.Provider value={state}>
