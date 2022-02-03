@@ -6,6 +6,8 @@ const utils_1 = require("../utils");
 const org_id_utils_1 = require("@windingtree/org.id-utils");
 const web3StorageApiPath = 'https://api.web3.storage';
 class Web3StorageApi extends base_1.BaseIpfsStorageApi {
+    authToken;
+    ipfsGateway;
     constructor(token, gateway) {
         super();
         if (!token) {
