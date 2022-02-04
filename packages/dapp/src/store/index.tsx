@@ -14,6 +14,7 @@ import { usePageNav } from '../hooks/usePageNav';
 import { useEncryptionAccount } from '../hooks/useEncryptionAccount';
 import { useEncryptionKey } from '../hooks/useEncryptionKey';
 import { useDappConfig } from '../hooks/useDappConfig';
+import { useIpfsNode } from '../hooks/useIpfsNode';
 
 // Config
 import {
@@ -95,6 +96,7 @@ export const AppStateProvider = ({ children }: PropsType) => {
   const [encryptionAccount, switchEncryptionAccount] = useEncryptionAccount();
   const [encryptionKey, switchEncryptionKey] = useEncryptionKey();
   const [dappConfig, switchDappConfig] = useDappConfig();
+  const [ipfsNode, startIpfsNode, stopIpfsNode, ipfsNodeLoading, ipfsNodeError] = useIpfsNode();
 
   useEffect(() => {
     if (web3ModalError) {
@@ -115,14 +117,20 @@ export const AppStateProvider = ({ children }: PropsType) => {
         payload: accountError
       })
     }
-  }, [dispatch, web3ModalError, networkError, accountError]);
+    if (ipfsNodeError) {
+      dispatch({
+        type: 'ERROR_ADD',
+        payload: ipfsNodeError
+      })
+    }
+  }, [dispatch, web3ModalError, networkError, accountError, ipfsNodeError]);
 
   useEffect(() => {
     dispatch({
       type: 'SET_CONNECTING',
-      payload: isConnecting || isNetworkIdLoading || isAccountLoading
+      payload: isConnecting || isNetworkIdLoading || isAccountLoading || ipfsNodeLoading
     })
-  }, [dispatch, isConnecting, isNetworkIdLoading, isAccountLoading]);
+  }, [dispatch, isConnecting, isNetworkIdLoading, isAccountLoading, ipfsNodeLoading]);
 
   useEffect(() => {
     dispatch({
@@ -245,6 +253,17 @@ export const AppStateProvider = ({ children }: PropsType) => {
       payload: switchDappConfig
     })
   }, [dispatch, switchDappConfig]);
+
+  useEffect(() => {
+    dispatch({
+      type: 'SET_IPFS_NODE',
+      payload: {
+        ipfsNode,
+        startIpfsNode,
+        stopIpfsNode
+      }
+    })
+  }, [dispatch, ipfsNode, startIpfsNode, stopIpfsNode]);
 
   return (
     <StateContext.Provider value={state}>

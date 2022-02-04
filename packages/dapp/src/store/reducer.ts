@@ -2,6 +2,7 @@ import type {Web3ModalProvider} from '../hooks/useWeb3Modal';
 import type {IProviderInfo} from 'web3modal';
 import type {Action} from './actions';
 import type {ThemeType} from 'grommet/themes';
+import type {IPFS} from '@windingtree/ipfs-apis';
 import {useReducer} from 'react';
 import Logger from '../utils/logger';
 import {ThemeMode} from '../hooks/useStyle';
@@ -31,6 +32,9 @@ export interface State {
   switchEncryptionKey: Function;
   dappConfig: string;
   switchDappConfig: Function;
+  ipfsNode?: IPFS;
+  startIpfsNode: Function;
+  stopIpfsNode: Function;
 }
 
 export const reducer = (state: State, action: Action): State => {
@@ -128,6 +132,13 @@ export const reducer = (state: State, action: Action): State => {
         signIn: action.payload.signIn,
         signOut: action.payload.signOut
       };
+    case 'SET_IPFS_NODE':
+      return {
+        ...state,
+        ipfsNode: action.payload.ipfsNode,
+        startIpfsNode: action.payload.startIpfsNode,
+        stopIpfsNode: action.payload.stopIpfsNode
+      };
     case 'ERROR_ADD':
       return {
         ...state,
@@ -167,6 +178,8 @@ const initialState: State = {
   switchEncryptionKey: () => {},
   dappConfig: "",
   switchDappConfig: () => {},
+  startIpfsNode: () => {},
+  stopIpfsNode: () => {}
 };
 
 export const useAppReducer = () => useReducer(reducer, initialState);
