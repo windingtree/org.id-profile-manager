@@ -1,25 +1,38 @@
 {
   "compilerOptions": {
     "strict": true,
-    "incremental": true,
-    "module": "CommonJS",
-    "target": "ES2020",
-    "moduleResolution": "node",
-    "resolveJsonModule": true,
-    "esModuleInterop": true,
-    "noImplicitAny": false,
-    "sourceMap": true,
+    "baseUrl": ".",
     "outDir": "dist",
+    "allowJs": true,
+    "checkJs": true,
+    "module": "commonjs",
+    "target": "esnext",
+    "noEmit": false,
+    "noEmitOnError": true,
     "declaration": true,
     "declarationMap": true,
-    "baseUrl": ".",
-    "experimentalDecorators": true,
-    "strictNullChecks": true,
+    "incremental": true,
     "composite": true,
-    "skipLibCheck": true
+    "isolatedModules": true,
+    "removeComments": false,
+    "sourceMap": true,
+    "esModuleInterop": true,
+    "moduleResolution": "node",
+    "noImplicitReturns": false,
+    "noFallthroughCasesInSwitch": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": false,
+    "importsNotUsedAsValues": "error",
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "stripInternal": true,
+    "resolveJsonModule": true
   },
   "include": [
     "src",
     "test"
+  ],
+  "exclude": [
+    "node_modules"
   ]
 }
