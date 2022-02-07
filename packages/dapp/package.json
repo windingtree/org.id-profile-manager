@@ -7,7 +7,7 @@
     "start": "react-scripts start",
     "start:senv": "npx senv ./dapp.senv yarn start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
+    "test": "CI=true react-scripts test",
     "eject": "react-scripts eject",
     "storybook": "start-storybook -p 6006 -s public"
   },
@@ -40,6 +40,7 @@
     "@testing-library/jest-dom": "^5.16.1",
     "@testing-library/react": "^12.1.2",
     "@testing-library/user-event": "^13.5.0",
+    "@testing-library/react-hooks": "7.0.2",
     "@types/crypto-js": "4.1.0",
     "@types/jest": "^27.4.0",
     "@windingtree/ipfs-apis": "1.0.0",
