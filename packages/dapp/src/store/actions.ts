@@ -1,4 +1,5 @@
 import type { Web3ModalProvider } from '../hooks/useWeb3Modal';
+import type { IPFS } from '@windingtree/ipfs-apis';
 import type { IProviderInfo } from 'web3modal';
 import type { ThemeType } from 'grommet/themes';
 import { ThemeMode } from '../hooks/useStyle';
@@ -112,6 +113,15 @@ export interface SetSwitchDappConfigAction {
   payload: Function;
 }
 
+export interface SetIpfsNodeAction {
+  type: 'SET_IPFS_NODE';
+  payload: {
+    ipfsNode: IPFS | undefined;
+    startIpfsNode: Function;
+    stopIpfsNode: Function;
+  }
+}
+
 export type Action =
 | SetConnectingAction
 | SetAccountAction
@@ -133,4 +143,5 @@ export type Action =
 | SetWeb3modalFunctionsAction
 | AddErrorAction
 | RemoveErrorAction
+| SetIpfsNodeAction
 | RemoveAllErrorsAction;
