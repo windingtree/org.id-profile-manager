@@ -1,57 +1,131 @@
-export interface NetworkConfig {
+export interface NetworkInfo {
   name: string;
   chainId: number;
   blockExplorer: string;
 }
 
-export interface DappConfig {
-  infuraId: string;
-  defaultNetworkId: number;
-  networks: NetworkConfig[];
-}
-
-if (!process.env.REACT_APP_NETWORK_ID || process.env.REACT_APP_NETWORK_ID === '') {
-  throw new Error('REACT_APP_NETWORK_ID must be provided in the ENV');
-}
-
-if (!process.env.REACT_APP_INFURA_ID || process.env.REACT_APP_INFURA_ID === '') {
-  throw new Error('REACT_APP_INFURA_ID must be provided in the ENV');
-}
-
-const config: DappConfig = {
-  infuraId: process.env.REACT_APP_INFURA_ID,
-  defaultNetworkId: Number(process.env.REACT_APP_NETWORK_ID),
-  networks: [
-    {
-      name: 'rinkeby',
-      chainId: 4,
-      blockExplorer: 'https://rinkeby.etherscan.io'
-    },
-    {
-      name: 'ropsten',
-      chainId: 3,
-      blockExplorer: 'https://ropsten.etherscan.io'
-    }
-  ]
+export interface NetworkWithRpc extends NetworkInfo {
+  rpc: string;
 };
 
-export const getInfuraId = (): string => {
-  return config.infuraId;
+export interface Networks {
+  [chainId: number]: NetworkWithRpc;
 }
 
-export const getNetworks = () => config.networks;
+export interface ApiKeys {
+  [name: string]: string;
+}
 
-export const getNetworksIds = () => config.networks.map(n => n.chainId);
+export interface DappConfig {
+  networks: Networks;
+  apiKeys: ApiKeys;
+}
 
-export const getNetworksNames = () => config.networks.map(n => n.name);
+export interface NetworkProviders {
+  [chainId: number]: string;
+}
 
-export const getDefaultNetwork = (): NetworkConfig => {
-  const network = config.networks
-    .filter(n => n.chainId === config.defaultNetworkId)[0];
-  if (!network) {
-    throw new Error('Network not found in the configuration');
+if (
+  !process.env.REACT_APP_NETWORK_PROVIDERS ||
+  process.env.REACT_APP_NETWORK_PROVIDERS === ''
+) {
+  throw new Error('REACT_APP_NETWORK_PROVIDERS must be provided in the ENV');
+}
+
+if (
+  !process.env.REACT_APP_FILE_WEB3STORAGE_KEY ||
+  process.env.REACT_APP_FILE_WEB3STORAGE_KEY === ''
+) {
+  throw new Error('REACT_APP_FILE_WEB3STORAGE_KEY must be provided in the ENV');
+}
+
+const allowedNetworks: NetworkInfo[] = [
+  {
+    name: 'Ropsten Testnet',
+    chainId: 3,
+    blockExplorer: 'https://ropsten.etherscan.io'
+  },
+  {
+    name: 'Rinkeby Testnet',
+    chainId: 4,
+    blockExplorer: 'https://rinkeby.etherscan.io'
+  },
+  {
+    name: 'Arbitrum Rinkeby',
+    chainId: 421611,
+    blockExplorer: 'https://rinkeby-explorer.arbitrum.io'
+  },
+  {
+    name: 'Sokol Testnet (xDAI)',
+    chainId: 77,
+    blockExplorer: 'https://blockscout.com/poa/sokol'
+  },
+];
+
+let networks: Networks;
+
+try {
+  const providers = JSON.parse(process.env.REACT_APP_NETWORK_PROVIDERS) as NetworkProviders;
+  networks = allowedNetworks
+    .map(
+      (n: NetworkInfo): NetworkWithRpc =>
+        ({
+          ...n,
+          rpc: providers[n.chainId] || ''
+        })
+    )
+    .reduce(
+      (a: Networks, v: NetworkWithRpc) => ({
+        ...a,
+        [v.chainId]: v
+      }),
+      {}
+    );
+} catch (_) {
+  throw new Error('Unable to parse networks providers configuration');
+}
+
+// All networks must have RPC configured
+Object
+  .entries(networks)
+  .forEach((n: [string, NetworkWithRpc]) => {
+  if (!n[1].rpc || n[1].rpc === '') {
+    throw new Error(`RPC URI not found for the ${n[1].name}`);
   }
-  return network;
-}
+});
+
+const config: DappConfig = {
+  networks,
+  apiKeys: {
+    web3Storage: process.env.REACT_APP_FILE_WEB3STORAGE_KEY
+  }
+};
+
+export const getNetworks = (): Networks => config.networks;
+
+export const getNetworksIds = (): number[] => Object
+  .keys(config.networks)
+  .map(chainId => Number(chainId));
+
+export const getNetworksNames = (): string[] => Object
+  .entries(config.networks)
+  .map((n) => n[1].name);
+
+export const getNetworksRpcs = (): NetworkProviders => Object
+  .entries(config.networks)
+  .reduce(
+    (a: NetworkProviders, v: [string, NetworkWithRpc]) => ({
+      ...a,
+      [Number(v[0])]: v[1].rpc
+    }),
+    {}
+  );
+
+export const getApiKey = (name: string): string => {
+  if (!config.apiKeys[name]) {
+    throw new Error(`${name} API key not found`);
+  }
+  return config.apiKeys[name];
+};
 
 export default config;

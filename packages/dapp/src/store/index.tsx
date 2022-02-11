@@ -18,9 +18,8 @@ import { useIpfsNode } from '../hooks/useIpfsNode';
 
 // Config
 import {
-  getDefaultNetwork,
   getNetworksIds,
-  getInfuraId
+  getNetworksRpcs
 } from '../config';
 
 // Initialize logger
@@ -57,18 +56,17 @@ export const useAppDispatch = () => {
   return ctx;
 }
 
-const defaultNetwork = getDefaultNetwork();
 const allowedNetworksIds = getNetworksIds();
+const rpc = getNetworksRpcs();
 
 // Web3Modal initialization
 const web3ModalConfig: Web3ModalConfig = {
-  network: defaultNetwork.name,
   cacheProvider: true,
   providerOptions: {
     walletconnect: {
       package: WalletConnectProvider,
       options: {
-        infuraId: getInfuraId()
+        rpc
       }
     }
   }
