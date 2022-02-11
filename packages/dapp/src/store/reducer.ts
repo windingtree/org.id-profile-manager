@@ -1,8 +1,8 @@
-import type {Web3ModalProvider} from '../hooks/useWeb3Modal';
-import type {IProviderInfo} from 'web3modal';
-import type {Action} from './actions';
-import type {ThemeType} from 'grommet/themes';
-import type {IPFS} from '@windingtree/ipfs-apis';
+import type { Web3ModalProvider } from '../hooks/useWeb3Modal';
+import type { IProviderInfo } from 'web3modal';
+import type { Action, State, GenericStateRecord } from './actions';
+import type { ThemeType } from 'grommet/themes';
+import type { IPFS } from '@windingtree/ipfs-apis';
 import {useReducer} from 'react';
 import Logger from '../utils/logger';
 import {ThemeMode} from '../hooks/useStyle';
@@ -11,35 +11,11 @@ import {CurrentPage} from '../hooks/usePageNav';
 // Initialize logger
 const logger = Logger('Reducer');
 
-export interface State {
-  isConnecting: boolean;
-  networkId?: number;
-  isRightNetwork: boolean;
-  provider?: Web3ModalProvider;
-  injectedProvider?: IProviderInfo;
-  account?: string;
-  signIn: Function;
-  signOut: Function;
-  errors: string[];
-  theme?: ThemeType;
-  themeMode: ThemeMode;
-  switchThemeMode: Function;
-  currentPage: CurrentPage;
-  switchCurrentPage: Function;
-  encryptionAccount: string;
-  switchEncryptionAccount: Function;
-  encryptionKey: string;
-  switchEncryptionKey: Function;
-  dappConfig: string;
-  switchDappConfig: Function;
-  ipfsNode?: IPFS;
-  startIpfsNode: Function;
-  stopIpfsNode: Function;
-}
-
 export const reducer = (state: State, action: Action): State => {
   logger.debug('Dispatch', action);
+  let records: GenericStateRecord[];
   const type = action.type;
+
   switch (type) {
     case 'SET_CONNECTING':
       return {
@@ -138,6 +114,51 @@ export const reducer = (state: State, action: Action): State => {
         ipfsNode: action.payload.ipfsNode,
         startIpfsNode: action.payload.startIpfsNode,
         stopIpfsNode: action.payload.stopIpfsNode
+      };
+    case 'SET_RECORD':
+      if (!action.payload.name) {
+        throw new Error(`State record name must be provided with a payload`);
+      }
+      if (typeof action.payload.record !== 'object') {
+        throw new Error(`State record name must be provided with a payload`);
+      }
+      if (!action.payload.record.id) {
+        throw new Error(`State record name must have Id property defined`);
+      }
+      // Add or update a record
+      records = state[action.payload.name] as GenericStateRecord[];
+      const knownRecord = records.filter(
+        (r: GenericStateRecord) => r.id === action.payload.record.id
+      )[0] || {};
+      const restRecords = records.filter(
+        (r: GenericStateRecord) => r.id !== action.payload.record.id
+      );
+      return {
+        ...state,
+        [action.payload.name]: [
+          ...restRecords,
+          ...[
+            {
+              ...knownRecord,
+              ...action.payload.record
+            }
+          ]
+        ]
+      };
+    case 'REMOVE_RECORD':
+      if (!action.payload.name) {
+        throw new Error(`State record name must be provided with a payload`);
+      }
+      if (!action.payload.id) {
+        throw new Error(`State record Id must be provided with a payload`);
+      }
+      // Remove record
+      records = state[action.payload.name] as GenericStateRecord[];
+      return {
+        ...state,
+        [action.payload.name]: records.filter(
+          (r: GenericStateRecord) => r.id !== action.payload.id
+        )
       };
     case 'ERROR_ADD':
       return {

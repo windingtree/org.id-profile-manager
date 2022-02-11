@@ -5,6 +5,37 @@ import type { ThemeType } from 'grommet/themes';
 import { ThemeMode } from '../hooks/useStyle';
 import { CurrentPage } from '../hooks/usePageNav';
 
+export interface GenericStateRecord {
+  id: string;
+  [key: string]: unknown;
+}
+export interface State {
+  isConnecting: boolean;
+  networkId?: number;
+  isRightNetwork: boolean;
+  provider?: Web3ModalProvider;
+  injectedProvider?: IProviderInfo;
+  account?: string;
+  signIn: Function;
+  signOut: Function;
+  errors: string[];
+  theme?: ThemeType;
+  themeMode: ThemeMode;
+  switchThemeMode: Function;
+  currentPage: CurrentPage;
+  switchCurrentPage: Function;
+  encryptionAccount: string;
+  switchEncryptionAccount: Function;
+  encryptionKey: string;
+  switchEncryptionKey: Function;
+  dappConfig: string;
+  switchDappConfig: Function;
+  ipfsNode?: IPFS;
+  startIpfsNode: Function;
+  stopIpfsNode: Function;
+  [key: string]: unknown | GenericStateRecord[];
+}
+
 export interface SetConnectingAction {
   type: 'SET_CONNECTING',
   payload: boolean;
@@ -122,6 +153,22 @@ export interface SetIpfsNodeAction {
   }
 }
 
+export interface SetRecordAction {
+  type: 'SET_RECORD',
+  payload: {
+    name: string,
+    record: GenericStateRecord
+  }
+}
+
+export interface RemoveRecordAction {
+  type: 'REMOVE_RECORD',
+  payload: {
+    name: string,
+    id: string
+  }
+}
+
 export type Action =
 | SetConnectingAction
 | SetAccountAction
@@ -141,7 +188,9 @@ export type Action =
 | SetSwitchDappConfigAction
 | SetInjectedProviderAction
 | SetWeb3modalFunctionsAction
+| SetIpfsNodeAction
+| SetRecordAction
+| RemoveRecordAction
 | AddErrorAction
 | RemoveErrorAction
-| SetIpfsNodeAction
 | RemoveAllErrorsAction;
