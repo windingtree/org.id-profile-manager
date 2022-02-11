@@ -15,6 +15,7 @@ import { useEncryptionAccount } from '../hooks/useEncryptionAccount';
 import { useEncryptionKey } from '../hooks/useEncryptionKey';
 import { useDappConfig } from '../hooks/useDappConfig';
 import { useIpfsNode } from '../hooks/useIpfsNode';
+import { useKeysManager } from '../hooks/useKeysManager';
 
 // Config
 import {
@@ -95,6 +96,7 @@ export const AppStateProvider = ({ children }: PropsType) => {
   const [encryptionKey, switchEncryptionKey] = useEncryptionKey();
   const [dappConfig, switchDappConfig] = useDappConfig();
   const [ipfsNode, startIpfsNode, stopIpfsNode, ipfsNodeLoading, ipfsNodeError] = useIpfsNode();
+  const [keys, addKey, updateKey, removeKey, revokeKey, keysManagerLoading, keysManagerError] = useKeysManager();
 
   useEffect(() => {
     if (web3ModalError) {
@@ -121,14 +123,20 @@ export const AppStateProvider = ({ children }: PropsType) => {
         payload: ipfsNodeError
       })
     }
-  }, [dispatch, web3ModalError, networkError, accountError, ipfsNodeError]);
+    if (keysManagerError) {
+      dispatch({
+        type: 'ERROR_ADD',
+        payload: keysManagerError
+      })
+    }
+  }, [dispatch, web3ModalError, networkError, accountError, ipfsNodeError, keysManagerError]);
 
   useEffect(() => {
     dispatch({
       type: 'SET_CONNECTING',
-      payload: isConnecting || isNetworkIdLoading || isAccountLoading || ipfsNodeLoading
+      payload: isConnecting || isNetworkIdLoading || isAccountLoading || ipfsNodeLoading || keysManagerLoading
     })
-  }, [dispatch, isConnecting, isNetworkIdLoading, isAccountLoading, ipfsNodeLoading]);
+  }, [dispatch, isConnecting, isNetworkIdLoading, isAccountLoading, ipfsNodeLoading, keysManagerLoading]);
 
   useEffect(() => {
     dispatch({
@@ -262,6 +270,19 @@ export const AppStateProvider = ({ children }: PropsType) => {
       }
     })
   }, [dispatch, ipfsNode, startIpfsNode, stopIpfsNode]);
+
+  useEffect(() => {
+    dispatch({
+      type: 'SET_KEYS_MANAGER',
+      payload: {
+        keys,
+        addKey,
+        updateKey,
+        removeKey,
+        revokeKey
+      }
+    })
+  }, [dispatch, keys, addKey, updateKey, removeKey, revokeKey]);
 
   return (
     <StateContext.Provider value={state}>

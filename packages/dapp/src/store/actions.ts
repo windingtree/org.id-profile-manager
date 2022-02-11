@@ -4,6 +4,7 @@ import type { IProviderInfo } from 'web3modal';
 import type { ThemeType } from 'grommet/themes';
 import { ThemeMode } from '../hooks/useStyle';
 import { CurrentPage } from '../hooks/usePageNav';
+import { Keys } from '../hooks/useKeysManager';
 
 export interface SetConnectingAction {
   type: 'SET_CONNECTING',
@@ -122,6 +123,17 @@ export interface SetIpfsNodeAction {
   }
 }
 
+export interface SetKeysManagerAction {
+  type: 'SET_KEYS_MANAGER';
+  payload: {
+    keys:Keys;
+    addKey:Function;
+    updateKey: Function;
+    removeKey: Function;
+    revokeKey: Function;
+  }
+}
+
 export type Action =
 | SetConnectingAction
 | SetAccountAction
@@ -144,4 +156,5 @@ export type Action =
 | AddErrorAction
 | RemoveErrorAction
 | SetIpfsNodeAction
+| SetKeysManagerAction
 | RemoveAllErrorsAction;

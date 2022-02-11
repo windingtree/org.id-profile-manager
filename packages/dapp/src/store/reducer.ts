@@ -7,6 +7,7 @@ import {useReducer} from 'react';
 import Logger from '../utils/logger';
 import {ThemeMode} from '../hooks/useStyle';
 import {CurrentPage} from '../hooks/usePageNav';
+import { Keys } from '../hooks/useKeysManager';
 
 // Initialize logger
 const logger = Logger('Reducer');
@@ -35,6 +36,11 @@ export interface State {
   ipfsNode?: IPFS;
   startIpfsNode: Function;
   stopIpfsNode: Function;
+  keys: Keys;
+  addKey:Function;
+  updateKey: Function;
+  removeKey: Function;
+  revokeKey: Function;
 }
 
 export const reducer = (state: State, action: Action): State => {
@@ -139,6 +145,15 @@ export const reducer = (state: State, action: Action): State => {
         startIpfsNode: action.payload.startIpfsNode,
         stopIpfsNode: action.payload.stopIpfsNode
       };
+    case 'SET_KEYS_MANAGER':
+      return {
+        ...state,
+        keys: action.payload.keys,
+        addKey: action.payload.addKey,
+        updateKey: action.payload.updateKey,
+        removeKey: action.payload.removeKey,
+        revokeKey: action.payload.revokeKey
+      };
     case 'ERROR_ADD':
       return {
         ...state,
@@ -179,7 +194,12 @@ const initialState: State = {
   dappConfig: "",
   switchDappConfig: () => {},
   startIpfsNode: () => {},
-  stopIpfsNode: () => {}
+  stopIpfsNode: () => {},
+  keys:[],
+  addKey: () => {},
+  updateKey: () => {},
+  removeKey: () => {},
+  revokeKey: () => {}
 };
 
 export const useAppReducer = () => useReducer(reducer, initialState);
