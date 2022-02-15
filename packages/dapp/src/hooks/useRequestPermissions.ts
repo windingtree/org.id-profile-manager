@@ -3,7 +3,7 @@ import { useState, useCallback } from 'react';
 import Logger from '../utils/logger';
 
 // Initialize logger
-const logger = Logger('useRequestAccounts');
+const logger = Logger('useRequestPermissions');
 
 export const allowedWalletPermissionsTypes: string[] =
 	['eth_accounts'];

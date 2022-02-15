@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import type { Web3ModalConfig } from '../hooks/useWeb3Modal';
 import { createContext, useContext, useEffect } from 'react';
 import WalletConnectProvider from '@walletconnect/web3-provider';
-import Logger from '../utils/logger';
+// import Logger from '../utils/logger';
 import { useAppReducer } from './reducer';
 
 // Custom hooks
@@ -23,7 +23,7 @@ import {
 } from '../config';
 
 // Initialize logger
-const logger = Logger('Store');
+// const logger = Logger('Store');
 
 export type AppReducerType = ReturnType<typeof useAppReducer>;
 export type State = AppReducerType[0];
@@ -34,10 +34,6 @@ export const DispatchContext = createContext<Dispatch | null>(null);
 
 export interface PropsType {
   children: ReactNode;
-}
-export interface GenericStateRecord {
-  id: string;
-  [key: string]: unknown;
 }
 
 export const useAppState = () => {

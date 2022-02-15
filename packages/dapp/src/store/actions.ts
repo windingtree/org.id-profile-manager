@@ -2,12 +2,21 @@ import type { Web3ModalProvider } from '../hooks/useWeb3Modal';
 import type { IPFS } from '@windingtree/ipfs-apis';
 import type { IProviderInfo } from 'web3modal';
 import type { ThemeType } from 'grommet/themes';
+import type { VerificationMethodReference } from '@windingtree/org.json-schema/types/org.json';
 import { ThemeMode } from '../hooks/useStyle';
 import { CurrentPage } from '../hooks/usePageNav';
 
 export interface GenericStateRecord {
   id: string;
   [key: string]: unknown;
+}
+
+export interface KeyRecord extends GenericStateRecord {
+  type: KeyType;
+	publicKey: string; // Ethereum account address
+	tag: string; // Unique across records formatted string
+	note?: string; // Key description
+	revocation?: VerificationMethodReference['verificationMethodRevocation'];
 }
 export interface State {
   isConnecting: boolean;
@@ -33,6 +42,7 @@ export interface State {
   ipfsNode?: IPFS;
   startIpfsNode: Function;
   stopIpfsNode: Function;
+  keys: KeyRecord[];
   [key: string]: unknown | GenericStateRecord[];
 }
 

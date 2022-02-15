@@ -1,14 +1,22 @@
-import type { VerificationMethodReference } from '@windingtree/org.json-schema/types/org.json';
 import type { AnySchema } from '@windingtree/org.id-utils/dist/object';
-import type { GenericStateRecord } from '../store';
-import { useAppDispatch, useAppState } from '../store';
+import type { KeyRecord } from '../store/actions';
 import { useState, useCallback, useEffect } from 'react';
-
 import { object, uid } from '@windingtree/org.id-utils';
 import { org } from '@windingtree/org.json-schema';
+import { useAppDispatch, useAppState } from '../store';
+import Logger from '../utils/logger';
 
-export const revocationReasonValues = object.getDeepValue(org, 'definitions.VerificationMethodRevocationReference.properties.reason.enum') as string[];
-export type RevocationReference = typeof revocationReasonValues[number]
+// Initialize logger
+const logger = Logger('useKeysManager');
+const UNKNOWN_ERROR = 'Unknown useKeysManager error';
+
+export const revocationReasonValues = object
+  .getDeepValue(
+    org,
+    'definitions.VerificationMethodRevocationReason.properties.reason.enum'
+  ) as string[];
+
+export type RevocationReason = typeof revocationReasonValues[number];
 
 export const allowedKeysTypes: string[] = ['EcdsaSecp256k1VerificationKey2019'];
 
@@ -52,21 +60,13 @@ export const keyRecordSchema: AnySchema = {
   required: ['id', 'type', 'publicKey', 'tag']
 }
 
-export interface KeyRecord extends GenericStateRecord {
-  type: KeyType;
-	publicKey: string; // Ethereum account address
-	tag: string; // Unique across records formatted string
-	note?: string; // Key description
-	revocation?: VerificationMethodReference['verificationMethodRevocation']; // see this type for details
-}
-
 export type Keys = KeyRecord[];
 
 export type UseKeysManagerHook = [
   addKey: (record: KeyRecord) => void,
   updateKey: (record: KeyRecord) => void,
   removeKey: (tag: string) => void,
-  revokeKey: (tag: string, reason:RevocationReference) => void,
+  revokeKey: (tag: string, reason:RevocationReason) => void,
   loading: boolean,
   error: string | undefined,
 ];
@@ -83,136 +83,155 @@ export const useKeysManager = (): UseKeysManagerHook => {
     setLoading(false);
   }, [keys])
 
-  const findKeyById = useCallback((id:string) => (
-    keys as Keys).find((key) => key.id === id
+  const findKeyById = useCallback(
+    (id: string): KeyRecord | undefined => keys.find((key) => key.id === id
   ), [keys]);
 
-  const findKeyByTag = useCallback((tag:string) => (
-    keys as Keys).find((key) => key.tag === tag
+  const findKeyByTag = useCallback(
+    (tag: string): KeyRecord | undefined => keys.find((key) => key.tag === tag
   ), [keys]);
 
-  const validateKeyWithSchema = (record:KeyRecord) => object.validateWithSchemaOrRef(
-    keyRecordSchema,
-    '',
-    record as KeyRecord
+  const validateKeyWithSchema = (record: KeyRecord) =>
+    object.validateWithSchemaOrRef(
+      keyRecordSchema,
+      '',
+      record as KeyRecord
+    );
+
+  const addKey = useCallback(
+    (record: KeyRecord): void => {
+      try {
+        setLoading(true);
+        record = {
+          ...record,
+          id: uid.simpleUid(8)
+        };
+        const validationResult = validateKeyWithSchema(record);
+
+        if (validationResult !== null) {
+          throw new Error(`Validation error: ${validationResult}`);
+        }
+
+        let keyExist = findKeyById(record.id);
+
+        if (keyExist !== undefined) {
+          throw new Error('Provided key already exists');
+        }
+
+        let tagExist = findKeyByTag(record.tag);
+
+        if (tagExist !== undefined) {
+          throw new Error('Provided tag already used, pick another one');
+        }
+
+        dispatch({
+          type: 'SET_RECORD',
+          payload: {
+            name: 'keys',
+            record
+          }
+        });
+      } catch(error) {
+        logger.error(error);
+        setError((error as Error).message || UNKNOWN_ERROR);
+        setLoading(false);
+      }
+    },
+    [findKeyById, findKeyByTag, setLoading, setError, dispatch]
   );
 
-  const addKey = useCallback((record:KeyRecord) => {
-    try {
-      setLoading(true);
-      record = {
-        ...record,
-        id: uid.simpleUid(8)
-      };
-      const validationResult = validateKeyWithSchema(record)
-      if (validationResult !== null) {
-        setLoading(false);
-        setError(`Validation error: ${validationResult}`)
-        return
-      }
-      let keyExist = findKeyById(record.id)
-      if (keyExist !== undefined) {
-        setError('Provided key already exists')
-        setLoading(false);
-        return 
-      }
-      let tagExist = findKeyByTag(record.tag)
-      if (tagExist !== undefined) {
-        setError('Provided tag already used, pick another one')
-        setLoading(false);
-        return
-      }
-  
-      dispatch({
-        type: 'SET_RECORD',
-        payload: {
-          name: 'keys',
-          record
+  const updateKey = useCallback(
+    (record: KeyRecord): void => {
+      try{
+        setLoading(true);
+        const validationResult = validateKeyWithSchema(record);
+
+        if (validationResult !== null) {
+          throw new Error(`Validation error: ${validationResult}`);
         }
-      });
-    } catch(error) {
-      setError((error as Error).message || 'Unknown useIpfsNode error');
-    } 
-  }, [findKeyById, findKeyByTag, setLoading, setError, dispatch]);
 
-  const updateKey = useCallback((record:KeyRecord) => {
-    try{
-      setLoading(true);
-      const validationResult = validateKeyWithSchema(record)
-      if (validationResult !== null) {
-        setLoading(false);
-        setError(`Validation error: ${validationResult}`)
-        return
-      }
-      let keyExist = findKeyById(record.id)
-      if (keyExist === undefined) {
-        setError('Provided key does not have corresponding id')
-        setLoading(false);
-        return 
-      }
+        let keyExist = findKeyById(record.id);
 
-      dispatch({
-        type: 'SET_RECORD',
-        payload: {
-          name: 'keys',
-          record
+        if (keyExist === undefined) {
+          throw new Error('Provided key not found');
         }
-      });
-    } catch(error) {
-      setError((error as Error).message || 'Unknown useIpfsNode error');
-    }
-  }, [findKeyById, setLoading, setError, dispatch]);
 
-  const removeKey = useCallback((tag:string) => {
-    try {
-      setLoading(true);
-      let keyExist = findKeyByTag(tag)
-      if (keyExist === undefined) {
-        setError('Key with provided tag does not exist')
+        dispatch({
+          type: 'SET_RECORD',
+          payload: {
+            name: 'keys',
+            record
+          }
+        });
+      } catch(error) {
+        logger.error(error);
+        setError((error as Error).message || UNKNOWN_ERROR);
         setLoading(false);
-        return
       }
+    },
+    [findKeyById, setLoading, setError, dispatch]
+  );
 
-      dispatch({
-        type: 'REMOVE_RECORD',
-        payload: {
-          name: 'keys',
-          id: keyExist.id
+  const removeKey = useCallback(
+    (tag: string): void => {
+      try {
+        setLoading(true);
+        let keyExist = findKeyByTag(tag);
+
+        if (keyExist === undefined) {
+          throw new Error('Key with provided tag does not exist');
         }
-      });
-    } catch(error) {
-      setError((error as Error).message || 'Unknown useIpfsNode error');
-    } 
-  }, [findKeyByTag, setLoading, setError, dispatch]);
 
-  const revokeKey = useCallback((tag:string,reason:RevocationReference) => {
-    try {
-      setLoading(true);
-      let keyExist = findKeyByTag(tag)
-      if (keyExist === undefined) {
-        setError('Key with provided tag does not exist')
+        dispatch({
+          type: 'REMOVE_RECORD',
+          payload: {
+            name: 'keys',
+            id: keyExist.id
+          }
+        });
+      } catch(error) {
+        logger.error(error);
+        setError((error as Error).message || UNKNOWN_ERROR);
         setLoading(false);
-        return 
       }
-      
-      dispatch({
-        type: 'SET_RECORD',
-        payload: {
-          name: 'keys',
-          record: {
-            ...keyExist,
-            revocation: {
-              reason,
-              invalidityDate: new Date().toISOString()
+    },
+    [findKeyByTag, setLoading, setError, dispatch]
+  );
+
+  const revokeKey = useCallback(
+    (
+      tag: string,
+      reason: RevocationReason
+    ): void => {
+      try {
+        setLoading(true);
+        let keyExist = findKeyByTag(tag);
+
+        if (keyExist === undefined) {
+          throw new Error('Key with provided tag does not exist');
+        }
+
+        dispatch({
+          type: 'SET_RECORD',
+          payload: {
+            name: 'keys',
+            record: {
+              ...keyExist,
+              revocation: {
+                reason,
+                invalidityDate: new Date().toISOString()
+              }
             }
           }
-        }
-      });
-    } catch(error) {
-      setError((error as Error).message || 'Unknown useIpfsNode error');
-    }
-  }, [dispatch, setLoading,findKeyByTag, setError]);
-    
-    return [addKey, updateKey, removeKey, revokeKey, loading, error];
-  };
-  
+        });
+      } catch(error) {
+        logger.error(error);
+        setError((error as Error).message || UNKNOWN_ERROR);
+        setLoading(false);
+      }
+    },
+    [dispatch, setLoading,findKeyByTag, setError]
+  );
+
+  return [addKey, updateKey, removeKey, revokeKey, loading, error];
+};
