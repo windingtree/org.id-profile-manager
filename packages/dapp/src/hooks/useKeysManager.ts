@@ -1,5 +1,5 @@
 import type { AnySchema } from '@windingtree/org.id-utils/dist/object';
-import type { KeyRecord } from '../store/actions';
+import type { KeyRecordRaw, KeyRecord } from '../store/actions';
 import { useState, useCallback, useEffect } from 'react';
 import { object, uid } from '@windingtree/org.id-utils';
 import { org } from '@windingtree/org.json-schema';
@@ -22,6 +22,17 @@ export const allowedKeysTypes: string[] = ['EcdsaSecp256k1VerificationKey2019'];
 
 export type KeyType =
 	typeof allowedKeysTypes[number];
+
+export type Keys = KeyRecord[];
+
+export type UseKeysManagerHook = [
+  addKey: (record: KeyRecord) => void,
+  updateKey: (record: KeyRecord) => void,
+  removeKey: (tag: string) => void,
+  revokeKey: (tag: string, reason:RevocationReason) => void,
+  loading: boolean,
+  error: string | undefined,
+];
 
 export const keyRecordSchema: AnySchema = {
   type: 'object',
@@ -60,16 +71,18 @@ export const keyRecordSchema: AnySchema = {
   required: ['id', 'type', 'publicKey', 'tag']
 }
 
-export type Keys = KeyRecord[];
+const validateKeyWithSchema = (record: KeyRecord): string | null =>
+  object.validateWithSchemaOrRef(
+    keyRecordSchema,
+    '',
+    record
+  );
 
-export type UseKeysManagerHook = [
-  addKey: (record: KeyRecord) => void,
-  updateKey: (record: KeyRecord) => void,
-  removeKey: (tag: string) => void,
-  revokeKey: (tag: string, reason:RevocationReason) => void,
-  loading: boolean,
-  error: string | undefined,
-];
+const findKeyById = (keys: KeyRecord[], id: string): KeyRecord | undefined =>
+  keys.find((key) => key.id === id);
+
+const findKeyByTag = (keys: KeyRecord[], tag: string): KeyRecord | undefined =>
+  keys.find((key) => key.tag === tag);
 
 // UseKeysManager react hook
 export const useKeysManager = (): UseKeysManagerHook => {
@@ -83,42 +96,22 @@ export const useKeysManager = (): UseKeysManagerHook => {
     setLoading(false);
   }, [keys])
 
-  const findKeyById = useCallback(
-    (id: string): KeyRecord | undefined => keys.find((key) => key.id === id
-  ), [keys]);
-
-  const findKeyByTag = useCallback(
-    (tag: string): KeyRecord | undefined => keys.find((key) => key.tag === tag
-  ), [keys]);
-
-  const validateKeyWithSchema = (record: KeyRecord) =>
-    object.validateWithSchemaOrRef(
-      keyRecordSchema,
-      '',
-      record as KeyRecord
-    );
-
   const addKey = useCallback(
-    (record: KeyRecord): void => {
+    (rawRecord: KeyRecordRaw): void => {
       try {
         setLoading(true);
-        record = {
-          ...record,
+        const record = {
+          ...rawRecord,
           id: uid.simpleUid(8)
-        };
+        } as KeyRecord;
+
         const validationResult = validateKeyWithSchema(record);
 
         if (validationResult !== null) {
           throw new Error(`Validation error: ${validationResult}`);
         }
 
-        let keyExist = findKeyById(record.id);
-
-        if (keyExist !== undefined) {
-          throw new Error('Provided key already exists');
-        }
-
-        let tagExist = findKeyByTag(record.tag);
+        let tagExist = findKeyByTag(keys, record.tag);
 
         if (tagExist !== undefined) {
           throw new Error('Provided tag already used, pick another one');
@@ -137,7 +130,7 @@ export const useKeysManager = (): UseKeysManagerHook => {
         setLoading(false);
       }
     },
-    [findKeyById, findKeyByTag, setLoading, setError, dispatch]
+    [dispatch, setLoading, setError, keys]
   );
 
   const updateKey = useCallback(
@@ -150,7 +143,7 @@ export const useKeysManager = (): UseKeysManagerHook => {
           throw new Error(`Validation error: ${validationResult}`);
         }
 
-        let keyExist = findKeyById(record.id);
+        let keyExist = findKeyById(keys, record.id);
 
         if (keyExist === undefined) {
           throw new Error('Provided key not found');
@@ -169,14 +162,14 @@ export const useKeysManager = (): UseKeysManagerHook => {
         setLoading(false);
       }
     },
-    [findKeyById, setLoading, setError, dispatch]
+    [dispatch, setLoading, setError, keys]
   );
 
   const removeKey = useCallback(
     (tag: string): void => {
       try {
         setLoading(true);
-        let keyExist = findKeyByTag(tag);
+        let keyExist = findKeyByTag(keys, tag);
 
         if (keyExist === undefined) {
           throw new Error('Key with provided tag does not exist');
@@ -195,7 +188,7 @@ export const useKeysManager = (): UseKeysManagerHook => {
         setLoading(false);
       }
     },
-    [findKeyByTag, setLoading, setError, dispatch]
+    [dispatch, setLoading, setError, keys]
   );
 
   const revokeKey = useCallback(
@@ -205,7 +198,7 @@ export const useKeysManager = (): UseKeysManagerHook => {
     ): void => {
       try {
         setLoading(true);
-        let keyExist = findKeyByTag(tag);
+        const keyExist = findKeyByTag(keys, tag);
 
         if (keyExist === undefined) {
           throw new Error('Key with provided tag does not exist');
@@ -230,7 +223,7 @@ export const useKeysManager = (): UseKeysManagerHook => {
         setLoading(false);
       }
     },
-    [dispatch, setLoading,findKeyByTag, setError]
+    [dispatch, setLoading, setError, keys]
   );
 
   return [addKey, updateKey, removeKey, revokeKey, loading, error];

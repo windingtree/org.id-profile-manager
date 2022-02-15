@@ -18,6 +18,9 @@ export interface KeyRecord extends GenericStateRecord {
 	note?: string; // Key description
 	revocation?: VerificationMethodReference['verificationMethodRevocation'];
 }
+
+export interface KeyRecordRaw extends Omit<KeyRecord, 'id'> {};
+
 export interface State {
   isConnecting: boolean;
   networkId?: number;
