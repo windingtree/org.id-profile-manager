@@ -35,6 +35,10 @@ export const DispatchContext = createContext<Dispatch | null>(null);
 export interface PropsType {
   children: ReactNode;
 }
+export interface GenericStateRecord {
+  id: string;
+  [key: string]: unknown;
+}
 
 export const useAppState = () => {
   const ctx = useContext(StateContext);
