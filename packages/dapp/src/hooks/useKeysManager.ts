@@ -78,10 +78,10 @@ const validateKeyWithSchema = (record: KeyRecord): string | null =>
     record
   );
 
-const findKeyById = (keys: KeyRecord[], id: string): KeyRecord | undefined =>
+export const findKeyById = (keys: KeyRecord[], id: string): KeyRecord | undefined =>
   keys.find((key) => key.id === id);
 
-const findKeyByTag = (keys: KeyRecord[], tag: string): KeyRecord | undefined =>
+export const findKeyByTag = (keys: KeyRecord[], tag: string): KeyRecord | undefined =>
   keys.find((key) => key.tag === tag);
 
 // UseKeysManager react hook
