@@ -3,6 +3,7 @@ import type { IPFS } from '@windingtree/ipfs-apis';
 import type { IProviderInfo } from 'web3modal';
 import type { ThemeType } from 'grommet/themes';
 import type { VerificationMethodReference } from '@windingtree/org.json-schema/types/org.json';
+import type { DidResolutionResponse } from '@windingtree/org.id-resolver';
 import { ThemeMode } from '../hooks/useStyle';
 import { CurrentPage } from '../hooks/usePageNav';
 
@@ -20,6 +21,19 @@ export interface KeyRecord extends GenericStateRecord {
 }
 
 export interface KeyRecordRaw extends Omit<KeyRecord, 'id'> {};
+
+export type ResolutionResult =
+	| 'OK'
+	| 'ERROR';
+
+export interface ResolverHistoryRecord extends GenericStateRecord {
+	name: string;
+	date: string; // date-time ISO
+	result: ResolutionResult;
+	report: DidResolutionResponse;
+}
+
+export interface ResolverHistoryRecordRaw extends Omit<ResolverHistoryRecord, 'id'> {};
 
 export interface State {
   isConnecting: boolean;
@@ -46,6 +60,7 @@ export interface State {
   startIpfsNode: Function;
   stopIpfsNode: Function;
   keys: KeyRecord[];
+  resolverHistory: ResolverHistoryRecord[];
   [key: string]: unknown | GenericStateRecord[];
 }
 

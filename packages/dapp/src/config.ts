@@ -1,6 +1,7 @@
 export interface NetworkInfo {
   name: string;
   chainId: number;
+  address: string;
   blockExplorer: string;
 }
 
@@ -43,21 +44,25 @@ const allowedNetworks: NetworkInfo[] = [
   {
     name: 'Ropsten Testnet',
     chainId: 3,
+    address: '0x405005a015EA0E24889D6963447Bb0D646D91C83',
     blockExplorer: 'https://ropsten.etherscan.io'
   },
   {
     name: 'Rinkeby Testnet',
     chainId: 4,
+    address: '0x877c5532B2a76148334CBfA32779A0b9ee414FBE',
     blockExplorer: 'https://rinkeby.etherscan.io'
   },
   {
     name: 'Arbitrum Rinkeby',
     chainId: 421611,
+    address: '0x3925A9d5554508b65a6490c450FB294A9173948B',
     blockExplorer: 'https://rinkeby-explorer.arbitrum.io'
   },
   {
     name: 'Sokol Testnet (xDAI)',
     chainId: 77,
+    address: '0xDd1231c0FD9083DA42eDd2BD4f041d0a54EF7BeE',
     blockExplorer: 'https://blockscout.com/poa/sokol'
   },
 ];
@@ -103,13 +108,21 @@ const config: DappConfig = {
 
 export const getNetworks = (): Networks => config.networks;
 
-export const getNetworksIds = (): number[] => Object
+export const getNetworksIds = (): string[] => Object
   .keys(config.networks)
-  .map(chainId => Number(chainId));
+  .map(chainId => chainId);
 
 export const getNetworksNames = (): string[] => Object
   .entries(config.networks)
   .map((n) => n[1].name);
+
+export const getNetworkByChainId = (chainId: number | string) => {
+  const network = config.networks[Number(chainId)];
+  if (network === undefined) {
+    throw new Error(`Network with chainId ${chainId} is not found`);
+  }
+  return network;
+};
 
 export const getNetworksRpcs = (): NetworkProviders => Object
   .entries(config.networks)
