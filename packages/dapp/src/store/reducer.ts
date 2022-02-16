@@ -1,13 +1,16 @@
+import type { Reducer } from 'react';
 import type { Action, State, GenericStateRecord } from './actions';
 import { useReducer } from 'react';
 import Logger from '../utils/logger';
+import { getState, storageReducer } from './localStorage';
+
 import { ThemeMode } from '../hooks/useStyle';
 import { CurrentPage } from '../hooks/usePageNav';
 
 // Initialize logger
 const logger = Logger('Reducer');
 
-export const reducer = (state: State, action: Action): State => {
+export const mainReducer = (state: State, action: Action): State => {
   logger.debug('Dispatch', action);
   let records: GenericStateRecord[];
   const type = action.type;
@@ -206,4 +209,33 @@ const initialState: State = {
   resolverHistory: []
 };
 
-export const useAppReducer = () => useReducer(reducer, initialState);
+export const combineReducers = (
+  reducers: Reducer<State, Action>[]
+): Reducer<State, Action> =>
+  (state: State, action: Action): State => {
+    let updatedState = state;
+
+    for (const reducer of reducers) {
+      updatedState = reducer(updatedState, action);
+    }
+
+    return updatedState;
+  };
+
+export const useAppReducer = () => {
+  // Restore the state from localStorage
+  const storedState = getState();
+
+  return useReducer(
+    combineReducers(
+      [
+        mainReducer,
+        storageReducer() // Always must be the last
+      ]
+    ),
+    {
+      ...initialState,
+      ...storedState
+    }
+  );
+};

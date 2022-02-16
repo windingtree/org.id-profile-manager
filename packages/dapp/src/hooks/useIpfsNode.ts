@@ -1,4 +1,4 @@
-import type { IPFS } from '@windingtree/ipfs-apis';
+import type { IPFS, Options as IpfsOptions } from '@windingtree/ipfs-apis';
 import { useState, useCallback, useEffect } from 'react';
 import { utils } from '@windingtree/ipfs-apis';
 
@@ -16,10 +16,10 @@ export const useIpfsNode = (silent = false): UseIpfsNode => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | undefined>(undefined);
 
-  const start = useCallback(async (): Promise<IPFS | undefined> => {
+  const start = useCallback(async (options?: IpfsOptions): Promise<IPFS | undefined> => {
     try {
       setLoading(true);
-      const ipfsNode = await utils.startIpfsGateway();
+      const ipfsNode = await utils.startIpfsGateway(options);
       setNode(ipfsNode);
       setLoading(false);
       return ipfsNode;
@@ -53,7 +53,16 @@ export const useIpfsNode = (silent = false): UseIpfsNode => {
 
   useEffect(() => {
     if (!silent) {
-      const ipfsNodePromise = start();
+      const ipfsNodePromise = start({
+        preload: {
+          addresses: [
+            '/dns4/node0.preload.ipfs.io/tcp/443/wss/p2p/QmZMxNdpMkewiVZLMRxaNxUeZpDUb34pWjZ1kZvsd16Zic',
+            '/dns4/node1.preload.ipfs.io/tcp/443/wss/p2p/Qmbut9Ywz9YEDrz8ySBSgWyJk41Uvm2QJPhwDJzJyGFsD6',
+            '/dns4/node2.preload.ipfs.io/tcp/443/wss/p2p/QmV7gnbW5VTcJ3oyM2Xk1rdFBJ3kTkvxc87UFGsun29STS',
+            '/dns4/node3.preload.ipfs.io/tcp/443/wss/p2p/QmY7JB6MQXhxHvq7dBDh4HpbH29v4yE9JRadAVpndvzySN'
+          ]
+        }
+      });
       return () => {
         doStop(ipfsNodePromise);
       };
