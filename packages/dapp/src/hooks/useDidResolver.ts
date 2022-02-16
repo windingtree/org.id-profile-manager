@@ -88,7 +88,7 @@ const resolveDid = async (
   const provider = new ethers.providers.JsonRpcProvider(rpc);
 
   const chainConfig = buildEvmChainConfig(
-    network,
+    String(network),
     'eip155',
     address,
     provider
