@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-require('dotenv').config();
-
-module.exports = function (config) {
+/* eslint-disable no-undef */
+module.exports = (config) => {
   config.set({
 
 
@@ -24,8 +23,7 @@ module.exports = function (config) {
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://www.npmjs.com/search?q=keywords:karma-preprocessor
     preprocessors: {
-      'src/**/*.ts': ['karma-typescript'],
-      'test/**/*.ts': ['karma-typescript']
+      '**/*.ts': ['karma-typescript']
     },
 
 
@@ -73,18 +71,15 @@ module.exports = function (config) {
 
     karmaTypescriptConfig: {
       tsconfig: 'tsconfig.json',
-      bundlerOptions: {
-        transforms: [
-          // eslint-disable-next-line no-undef
-          require('karma-typescript-es6-transform')()
-        ]
+      // bundlerOptions: {
+      //   transforms: [
+      //     // eslint-disable-next-line no-undef
+      //     require('karma-typescript-es6-transform')()
+      //   ]
+      // },
+      coverageOptions: {
+        instrumentation: false
       }
     },
-
-    client: {
-      mocha: {
-        timeout: 70000
-      }
-    }
   })
 }

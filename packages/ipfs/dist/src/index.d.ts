@@ -1,9 +1,9 @@
-import type { IPFS } from './utils';
+import type { IPFS, Options } from './utils';
 import { Web3StorageApi } from './apis/web3Storage';
 declare const utils: {
-    startIpfsGateway: () => Promise<import("ipfs-core-types/src/").IPFS<{}>>;
+    startIpfsGateway: (options?: import("ipfs-core/src/types").Options | undefined) => Promise<import("ipfs-core-types/src/").IPFS<{}>>;
     obj2File: (obj: unknown, fileName: string) => File;
     getIpfsChunks: (asyncIterator: AsyncIterable<Uint8Array>) => Promise<string>;
 };
-export { IPFS, Web3StorageApi, utils };
+export { IPFS, Options, Web3StorageApi, utils };
 //# sourceMappingURL=index.d.ts.map

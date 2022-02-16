@@ -1,9 +1,10 @@
-import type { IPFS } from 'ipfs-core';
+import type { IPFS, Options } from 'ipfs-core';
 import { TextDecoder, Blob } from '@web-std/blob';
 import { File } from '@web-std/file';
 import { create } from 'ipfs-core';
 
-export const startIpfsGateway = async (): Promise<IPFS> => create();
+export const startIpfsGateway = async (options?: Options): Promise<IPFS> =>
+  create(options);
 
 export const obj2File = (obj: unknown, fileName: string): File => {
   const blob = new Blob(
@@ -29,4 +30,4 @@ export const getIpfsChunks = async (asyncIterator: AsyncIterable<Uint8Array>): P
   return decoder.decode(concatenatedData);
 }
 
-export { IPFS };
+export { IPFS, Options };
