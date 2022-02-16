@@ -108,9 +108,9 @@ const config: DappConfig = {
 
 export const getNetworks = (): Networks => config.networks;
 
-export const getNetworksIds = (): string[] => Object
+export const getNetworksIds = (): number[] => Object
   .keys(config.networks)
-  .map(chainId => chainId);
+  .map(chainId => Number(chainId));
 
 export const getNetworksNames = (): string[] => Object
   .entries(config.networks)

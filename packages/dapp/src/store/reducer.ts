@@ -201,7 +201,9 @@ const initialState: State = {
   dappConfig: "",
   switchDappConfig: () => {},
   startIpfsNode: () => {},
-  stopIpfsNode: () => {}
+  stopIpfsNode: () => {},
+  keys: [],
+  resolverHistory: []
 };
 
 export const useAppReducer = () => useReducer(reducer, initialState);
