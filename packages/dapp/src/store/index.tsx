@@ -116,9 +116,16 @@ export const AppStateProvider = ({ children }: PropsType) => {
   useEffect(() => {
     dispatch({
       type: 'SET_CONNECTING',
-      payload: isConnecting || isNetworkIdLoading || isAccountLoading || ipfsNodeLoading
+      payload: isConnecting || isNetworkIdLoading || isAccountLoading
     })
-  }, [dispatch, isConnecting, isNetworkIdLoading, isAccountLoading, ipfsNodeLoading]);
+  }, [dispatch, isConnecting, isNetworkIdLoading, isAccountLoading]);
+
+  useEffect(() => {
+    dispatch({
+      type: 'SET_IPFS_NODE_CONNECTING',
+      payload: ipfsNodeLoading
+    })
+  }, [dispatch, ipfsNodeLoading]);
 
   useEffect(() => {
     dispatch({

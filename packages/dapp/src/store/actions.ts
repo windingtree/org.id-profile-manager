@@ -45,6 +45,7 @@ export interface State {
   errors: string[];
   themeMode: ThemeMode;
   ipfsNode?: IPFS;
+  isIpfsNodeConnecting: boolean;
   startIpfsNode: Function;
   stopIpfsNode: Function;
   keys: KeyRecord[];
@@ -110,6 +111,11 @@ export interface SetThemeModeAction {
   payload: ThemeMode;
 }
 
+export interface SetIpfsNodeConnectingAction {
+  type: 'SET_IPFS_NODE_CONNECTING';
+  payload: boolean;
+}
+
 export interface SetIpfsNodeAction {
   type: 'SET_IPFS_NODE';
   payload: {
@@ -144,6 +150,7 @@ export type Action =
 | SetThemeModeAction
 | SetInjectedProviderAction
 | SetWeb3modalFunctionsAction
+| SetIpfsNodeConnectingAction
 | SetIpfsNodeAction
 | SetRecordAction
 | RemoveRecordAction

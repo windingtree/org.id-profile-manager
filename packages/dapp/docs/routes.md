@@ -44,3 +44,20 @@ Create a menu with links to all registered pages. This component is used in the 
 ## `usePageTitle` hook
 
 Allows to get a page title for the currently loaded route. In the case of reoute that not registered this hook returns '404' (string). This hook is used in the header.
+
+## `Protected` component
+
+To create protected routes should be used `<Protected component={<Component />} path='/navigate/to' />`
+
+> `path` is defaults to `/`
+
+Here is an example of protected route config:
+
+```typescript
+{
+  path: '/keys',
+  element: <Protected component={<Keys />} />,
+  title: 'Keys management',
+  label: 'Keys'
+}
+```

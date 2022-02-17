@@ -1,10 +1,16 @@
 import type { ReactNode } from 'react';
 import type { Location } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { useRoutes, useNavigate, useLocation, resolvePath } from 'react-router-dom';
+import {
+  useRoutes,
+  useNavigate,
+  useLocation,
+  resolvePath
+} from 'react-router-dom';
 import { Menu } from 'grommet';
 import { Menu as MenuIcon } from 'grommet-icons';
 import { useAppState } from '../store';
+import { Protected } from './Protected';
 
 // Pages
 import { Home } from '../pages/Home';
@@ -15,7 +21,6 @@ export interface PageConfig {
   element: ReactNode;
   title: string;
   label: string;
-  protected?: boolean;
 }
 
 export const pagesConfig: PageConfig[] = [
@@ -27,7 +32,7 @@ export const pagesConfig: PageConfig[] = [
   },
   {
     path: '/keys',
-    element: <Keys />,
+    element: <Protected component={<Keys />} />,
     title: 'Keys management',
     label: 'Keys'
   }
