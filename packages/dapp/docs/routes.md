@@ -9,7 +9,7 @@ The Dapp routes configuration is in the file `./src/components/Routes.tsx`
 import { Home } from '../pages/Home';
 import { Keys } from '../pages/Keys';
 
-export const pagesConfig: PageConfig[] = [
+export const pagesRoutesConfig: Routes = [
   {
     path: '/',
     element: <Home />,
@@ -43,13 +43,9 @@ Create a menu with links to all registered pages. This component is used in the 
 
 ## `usePageTitle` hook
 
-Allows to get a page title for the currently loaded route. In the case of reoute that not registered this hook returns '404' (string). This hook is used in the header.
+Allows to get a page title for the currently loaded route. In the case of route that not registered this hook returns '404' (string). This hook is used in the header.
 
-## `Protected` component
-
-To create protected routes should be used `<Protected component={<Component />} path='/navigate/to' />`
-
-> `path` is defaults to `/`
+## Protected routes
 
 Here is an example of protected route config:
 
@@ -58,6 +54,9 @@ Here is an example of protected route config:
   path: '/keys',
   element: <Protected component={<Keys />} />,
   title: 'Keys management',
-  label: 'Keys'
+  label: 'Keys',
+  protected: true // <--
 }
 ```
+
+> When you try to access the protected route from the not logged-in state then after successful log-in you will be redirected to an initially requested route.

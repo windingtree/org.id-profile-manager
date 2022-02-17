@@ -16,14 +16,17 @@ import { Protected } from './Protected';
 import { Home } from '../pages/Home';
 import { Keys } from '../pages/Keys';
 
-export interface PageConfig {
+export interface RouteConfig {
   path: string;
   element: ReactNode;
   title: string;
   label: string;
+  protected?: boolean;
 }
 
-export const pagesConfig: PageConfig[] = [
+export type Routes = RouteConfig[];
+
+export const pagesRoutesConfig: Routes = [
   {
     path: '/',
     element: <Home />,
@@ -32,17 +35,28 @@ export const pagesConfig: PageConfig[] = [
   },
   {
     path: '/keys',
-    element: <Protected component={<Keys />} />,
+    element: <Keys />,
     title: 'Keys management',
-    label: 'Keys'
+    label: 'Keys',
+    protected: true
   }
 ];
 
+export const processPagesConfig = (config: Routes): Routes =>
+  config.map(
+    (route: RouteConfig) => route.protected
+      ? {
+        ...route,
+        element: <Protected component={route.element} />
+      }
+      : route
+  );
+
 export const getPageTitle = (location: Location): any => {
   let locationPathname = location.pathname;
-  const page = pagesConfig.find(
-    (p => {
-      const path = resolvePath(p.path);
+  const page = pagesRoutesConfig.find(
+    (route => {
+      const path = resolvePath(route.path);
       const toPathname = path.pathname;
       return locationPathname === toPathname ||
         (
@@ -65,13 +79,15 @@ export const usePageTitle = (): string => {
   return title;
 };
 
-export const AppRoutes = () => useRoutes(pagesConfig);
+export const AppRoutes = () => useRoutes(
+  processPagesConfig(pagesRoutesConfig)
+);
 
 export const GlobalMenu = () => {
   const { isConnecting } = useAppState();
   const navigate = useNavigate();
 
-  const buildMenuConfig = pagesConfig
+  const buildMenuConfig = pagesRoutesConfig
     .map(
       (item) => ({
         ...item,
