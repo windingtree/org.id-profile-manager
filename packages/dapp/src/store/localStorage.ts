@@ -1,4 +1,3 @@
-import type { Reducer } from 'react';
 import type { Action, State } from './actions';
 import Logger from '../utils/logger';
 
@@ -23,6 +22,8 @@ export const storageConnectorConfig: LocalStorageConnectorConfig = {
 export type StoredStateProps = typeof storageConnectorConfig.properties[number];
 
 export type StoredState = Pick<State, StoredStateProps>;
+
+export type TransformCallback = <T extends unknown>(serializedState: string) => T;
 
 // Stringifies objects with circular dependencies
 // @todo Move this helper to the SDK
@@ -58,6 +59,9 @@ export const safeObjectStringify = (obj: {}, indent?: number): string => {
   );
 };
 
+// Transformation function template
+export const defaultTransform = (serializedState: string) => serializedState;
+
 // Extracts selected properties into a new object
 export const selectedState = (state: State): StoredState =>
   storageConnectorConfig
@@ -71,7 +75,7 @@ export const selectedState = (state: State): StoredState =>
     );
 
 // Return stored sate
-export const getState = (): StoredState => {
+export const getState = (transform?: TransformCallback): StoredState => {
   try {
     let serializedState = localStorage.getItem(storagePropertyName);
 
@@ -81,6 +85,10 @@ export const getState = (): StoredState => {
       localStorage.setItem(storagePropertyName, emptyStorage);
       serializedState = emptyStorage;
     }
+
+    serializedState = transform
+      ? transform<string>(serializedState)
+      : serializedState;
 
     return JSON.parse(serializedState);
   } catch (error) {
@@ -92,9 +100,16 @@ export const getState = (): StoredState => {
 };
 
 // Saves state to localStorage
-export const setState = (state: StoredState): void => {
+export const setState = (
+  state: StoredState,
+  transform?: TransformCallback
+): void => {
   try {
-    localStorage.setItem(storagePropertyName, safeObjectStringify(state));
+    const serializedState = safeObjectStringify(state);
+    localStorage.setItem(
+      storagePropertyName,
+      transform ? transform<string>(serializedState) : serializedState
+    );
   } catch (error) {
     logger.error(error);
     throw new Error(
@@ -104,9 +119,9 @@ export const setState = (state: StoredState): void => {
 };
 
 // Returns combined reducer
-export const storageReducer = (): Reducer<State, Action> =>
+export const storageReducer = (transform?: TransformCallback) =>
   (state: State, _: Action): State => {
     const stateToStore = selectedState(state);
-    setState(stateToStore);
+    setState(stateToStore, transform);
     return state;
   };

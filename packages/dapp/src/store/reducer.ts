@@ -223,8 +223,7 @@ export const combineReducers = (
   };
 
 export const useAppReducer = () => {
-  // Restore the state from localStorage
-  const storedState = getState();
+  const storedState = getState(); // Restoration of the Dapp state
 
   return useReducer(
     combineReducers(
