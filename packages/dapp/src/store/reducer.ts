@@ -3,9 +3,7 @@ import type { Action, State, GenericStateRecord } from './actions';
 import { useReducer } from 'react';
 import Logger from '../utils/logger';
 import { getState, storageReducer } from './localStorage';
-
-import { ThemeMode } from '../hooks/useStyle';
-import { CurrentPage } from '../hooks/usePageNav';
+import { ThemeMode } from '../components/SwitchThemeMode';
 
 // Initialize logger
 const logger = Logger('Reducer');
@@ -32,60 +30,10 @@ export const mainReducer = (state: State, action: Action): State => {
           ...state,
           isRightNetwork: action.payload
         };
-      case 'SET_THEME':
-        return {
-          ...state,
-          theme: action.payload
-        };
       case 'SET_THEME_MODE':
         return {
           ...state,
           themeMode: action.payload
-        };
-      case 'SET_SWITCH_THEME_MODE':
-        return {
-          ...state,
-          switchThemeMode: action.payload
-        };
-      case 'SET_CURRENT_PAGE':
-        return {
-          ...state,
-          currentPage: action.payload
-        }
-      case 'SET_SWITCH_CURRENT_PAGE':
-        return {
-          ...state,
-          switchCurrentPage: action.payload
-        };
-      case 'SET_ENCRYPTION_ACCOUNT':
-        return {
-          ...state,
-          encryptionAccount: action.payload
-        }
-      case 'SET_SWITCH_ENCRYPTION_ACCOUNT':
-        return {
-          ...state,
-          switchEncryptionAccount: action.payload
-        };
-      case 'SET_ENCRYPTION_KEY':
-        return {
-          ...state,
-          encryptionKey: action.payload
-        }
-      case 'SET_SWITCH_ENCRYPTION_KEY':
-        return {
-          ...state,
-          switchEncryptionKey: action.payload
-        };
-      case 'SET_DAPP_CONFIG':
-        return {
-          ...state,
-          dappConfig: action.payload
-        }
-      case 'SET_SWITCH_DAPP_CONFIG':
-        return {
-          ...state,
-          switchDappConfig: action.payload
         };
       case 'SET_NETWORK_ID':
         return {
@@ -194,15 +142,6 @@ const initialState: State = {
   signOut: () => {},
   errors: [],
   themeMode:ThemeMode.light,
-  switchThemeMode: () => {},
-  currentPage: CurrentPage.home,
-  switchCurrentPage: () => {},
-  encryptionAccount: "",
-  switchEncryptionAccount: () => {},
-  encryptionKey: "",
-  switchEncryptionKey: () => {},
-  dappConfig: "",
-  switchDappConfig: () => {},
   startIpfsNode: () => {},
   stopIpfsNode: () => {},
   keys: [],

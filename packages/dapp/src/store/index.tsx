@@ -9,11 +9,6 @@ import { useAppReducer } from './reducer';
 import { useWeb3Modal } from '../hooks/useWeb3Modal';
 import { useNetworkId } from '../hooks/useNetworkId';
 import { useAccount } from '../hooks/useAccount';
-import { useStyle } from '../hooks/useStyle';
-import { usePageNav } from '../hooks/usePageNav';
-import { useEncryptionAccount } from '../hooks/useEncryptionAccount';
-import { useEncryptionKey } from '../hooks/useEncryptionKey';
-import { useDappConfig } from '../hooks/useDappConfig';
 import { useIpfsNode } from '../hooks/useIpfsNode';
 
 // Config
@@ -89,11 +84,6 @@ export const AppStateProvider = ({ children }: PropsType) => {
     networkError
   ] = useNetworkId(provider, allowedNetworksIds);
   const [account, isAccountLoading, accountError] = useAccount(provider);
-  const [theme, themeMode, switchThemeMode] = useStyle();
-  const [currentPage, switchCurrentPage] = usePageNav();
-  const [encryptionAccount, switchEncryptionAccount] = useEncryptionAccount();
-  const [encryptionKey, switchEncryptionKey] = useEncryptionKey();
-  const [dappConfig, switchDappConfig] = useDappConfig();
   const [ipfsNode, startIpfsNode, stopIpfsNode, ipfsNodeLoading, ipfsNodeError] = useIpfsNode();
 
   useEffect(() => {
@@ -174,83 +164,6 @@ export const AppStateProvider = ({ children }: PropsType) => {
       }
     })
   }, [dispatch, signIn, signOut]);
-
-  useEffect(() => {
-    dispatch({
-      type: 'SET_THEME',
-      payload: theme
-    })
-  }, [dispatch, theme]);
-
-  useEffect(() => {
-    dispatch({
-      type: 'SET_THEME_MODE',
-      payload: themeMode
-    })
-  }, [dispatch, themeMode]);
-
-  useEffect(() => {
-    dispatch({
-      type: 'SET_SWITCH_THEME_MODE',
-      payload: switchThemeMode
-    })
-  }, [dispatch, switchThemeMode]);
-
-  useEffect(() => {
-    dispatch({
-      type: 'SET_CURRENT_PAGE',
-      payload: currentPage
-    })
-  }, [dispatch, currentPage]);
-
-  useEffect(() => {
-    dispatch({
-      type: 'SET_SWITCH_CURRENT_PAGE',
-      payload: switchCurrentPage
-    })
-  }, [dispatch, switchCurrentPage]);
-
-  useEffect(() => {
-    dispatch({
-      type: 'SET_ENCRYPTION_ACCOUNT',
-      payload: encryptionAccount
-    })
-  }, [dispatch, encryptionAccount]);
-
-  useEffect(() => {
-    dispatch({
-      type: 'SET_SWITCH_ENCRYPTION_ACCOUNT',
-      payload: switchEncryptionAccount
-    })
-  }, [dispatch, switchEncryptionAccount]);
-
-  useEffect(() => {
-    dispatch({
-      type: 'SET_ENCRYPTION_KEY',
-      payload: encryptionKey
-    })
-  }, [dispatch, encryptionKey]);
-
-  useEffect(() => {
-    dispatch({
-      type: 'SET_SWITCH_ENCRYPTION_KEY',
-      payload: switchEncryptionKey
-    })
-  }, [dispatch, switchEncryptionKey]);
-
-  useEffect(() => {
-    dispatch({
-      type: 'SET_DAPP_CONFIG',
-      payload: dappConfig
-    })
-  }, [dispatch, dappConfig]);
-
-  useEffect(() => {
-    dispatch({
-      type: 'SET_SWITCH_DAPP_CONFIG',
-      payload: switchDappConfig
-    })
-  }, [dispatch, switchDappConfig]);
 
   useEffect(() => {
     dispatch({

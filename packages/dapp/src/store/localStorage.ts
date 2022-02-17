@@ -14,6 +14,7 @@ export interface LocalStorageConnectorConfig {
 
 export const storageConnectorConfig: LocalStorageConnectorConfig = {
   properties: [
+    'themeMode',
     'keys',
     'resolverHistory',
   ]

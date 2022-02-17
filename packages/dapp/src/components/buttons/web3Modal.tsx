@@ -1,10 +1,9 @@
 import { Button, Box, Spinner, Text } from 'grommet';
 import styled from 'styled-components';
-
 import { useAppState } from '../../store';
 
-const ButtonLabel = styled(Text)`
-  margin: 8px;
+const InnerSpinner = styled(Spinner)`
+  margin-left: 8px;
 `;
 
 export const SignInButton = () => {
@@ -15,30 +14,34 @@ export const SignInButton = () => {
       onClick={() => signIn()}
       disabled={isConnecting}
     >
-      {() => (<Box direction="row" align="center">
-        <ButtonLabel>Sign-In</ButtonLabel>
-        {isConnecting ? <Spinner /> : ''}
-      </Box>)}
+      {() => (
+        <Box direction='row' align='center' pad='small'>
+          <Text>
+          {isConnecting ? 'Connecting' : 'Connect'}
+          </Text>
+          {isConnecting && <InnerSpinner />}
+        </Box>
+      )}
     </Button>
   )
 };
 
 export const SignOutButton = () => {
-  const { isConnecting, signOut, switchEncryptionAccount, switchEncryptionKey } = useAppState();
+  const { isConnecting, signOut } = useAppState();
 
   return (
     <Button
-      onClick={() => {
-        signOut();
-        switchEncryptionAccount('');
-        switchEncryptionKey('');
-      }}
+      onClick={() => signOut()}
       disabled={isConnecting}
     >
-      {() => (<Box direction="row" align="center">
-        <ButtonLabel>Sign-Out</ButtonLabel>
-        {isConnecting ? <Spinner /> : ''}
-      </Box>)}
+      {() => (
+        <Box direction='row' align='center' pad='small'>
+          <Text>
+            {isConnecting ? 'Connecting' : 'Disconnect'}
+          </Text>
+          {isConnecting && <InnerSpinner />}
+        </Box>
+      )}
     </Button>
   )
 };

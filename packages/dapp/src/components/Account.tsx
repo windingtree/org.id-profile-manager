@@ -23,14 +23,12 @@ export const Account = ({ account }: AccountProps) => {
   }
 
   return (
-    <Box direction="row" align="center" pad='medium'>
-      <Box>
-        <AccountIcon
-          seed={account}
-          size={7}
-          scale={4}
-        />
-      </Box>
+    <Box direction='row' align='center' pad='small'>
+      <AccountIcon
+        seed={account}
+        size={7}
+        scale={4}
+      />
       <AccountHash
         onClick={() => copyToClipboard(account)}
       >

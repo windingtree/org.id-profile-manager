@@ -1,11 +1,9 @@
 import type { Web3ModalProvider } from '../hooks/useWeb3Modal';
 import type { IPFS } from '@windingtree/ipfs-apis';
 import type { IProviderInfo } from 'web3modal';
-import type { ThemeType } from 'grommet/themes';
 import type { VerificationMethodReference } from '@windingtree/org.json-schema/types/org.json';
 import type { DidResolutionResponse } from '@windingtree/org.id-resolver';
-import { ThemeMode } from '../hooks/useStyle';
-import { CurrentPage } from '../hooks/usePageNav';
+import { ThemeMode } from '../components/SwitchThemeMode';
 
 export interface GenericStateRecord {
   id: string;
@@ -45,17 +43,7 @@ export interface State {
   signIn: Function;
   signOut: Function;
   errors: string[];
-  theme?: ThemeType;
   themeMode: ThemeMode;
-  switchThemeMode: Function;
-  currentPage: CurrentPage;
-  switchCurrentPage: Function;
-  encryptionAccount: string;
-  switchEncryptionAccount: Function;
-  encryptionKey: string;
-  switchEncryptionKey: Function;
-  dappConfig: string;
-  switchDappConfig: Function;
   ipfsNode?: IPFS;
   startIpfsNode: Function;
   stopIpfsNode: Function;
@@ -117,59 +105,9 @@ export interface RemoveAllErrorsAction {
   payload: number;
 }
 
-export interface SetThemeAction {
-  type: 'SET_THEME';
-  payload: ThemeType;
-}
-
 export interface SetThemeModeAction {
   type: 'SET_THEME_MODE';
   payload: ThemeMode;
-}
-
-export interface SetSwitchThemeModeAction {
-  type: 'SET_SWITCH_THEME_MODE';
-  payload: Function;
-}
-
-export interface SetCurrentPageAction {
-  type: 'SET_CURRENT_PAGE';
-  payload: CurrentPage;
-}
-
-export interface SetSwitchCurrentPageAction {
-  type: 'SET_SWITCH_CURRENT_PAGE';
-  payload: Function;
-}
-
-export interface SetEncryptionAccountAction {
-  type: 'SET_ENCRYPTION_ACCOUNT';
-  payload: string;
-}
-
-export interface SetSwitchEncryptionAccountAction {
-  type: 'SET_SWITCH_ENCRYPTION_ACCOUNT';
-  payload: Function;
-}
-
-export interface SetEncryptionKeyAction {
-  type: 'SET_ENCRYPTION_KEY';
-  payload: string;
-}
-
-export interface SetSwitchEncryptionKeyAction {
-  type: 'SET_SWITCH_ENCRYPTION_KEY';
-  payload: Function;
-}
-
-export interface SetDappConfigAction {
-  type: 'SET_DAPP_CONFIG';
-  payload: string;
-}
-
-export interface SetSwitchDappConfigAction {
-  type: 'SET_SWITCH_DAPP_CONFIG';
-  payload: Function;
 }
 
 export interface SetIpfsNodeAction {
@@ -203,17 +141,7 @@ export type Action =
 | SetIsRightNetworkAction
 | SetNetworkIdAction
 | SetProviderAction
-| SetThemeAction
 | SetThemeModeAction
-| SetSwitchThemeModeAction
-| SetCurrentPageAction
-| SetSwitchCurrentPageAction
-| SetEncryptionAccountAction
-| SetSwitchEncryptionAccountAction
-| SetEncryptionKeyAction
-| SetSwitchEncryptionKeyAction
-| SetDappConfigAction
-| SetSwitchDappConfigAction
 | SetInjectedProviderAction
 | SetWeb3modalFunctionsAction
 | SetIpfsNodeAction

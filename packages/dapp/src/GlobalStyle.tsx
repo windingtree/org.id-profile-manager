@@ -1,22 +1,21 @@
 import { Grommet } from 'grommet';
-import styled from 'styled-components';
-
+import { grommet } from 'grommet/themes';
+import { generate } from 'grommet/themes/base';
+import { deepMerge } from 'grommet/utils';
 import { useAppState } from './store';
 
-const GrommetWrapper = styled(Grommet)`
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-`;
+const baseTheme = deepMerge(generate(16), grommet);
 
-const GlobalStyle:React.FC = ({children}) => {
-  const { theme, themeMode } = useAppState();
+export const GlobalStyle:React.FC = ({children}) => {
+  const { themeMode } = useAppState();
 
   return (
-    <GrommetWrapper theme={theme} themeMode={themeMode}>
+    <Grommet
+      theme={baseTheme}
+      themeMode={themeMode}
+      full
+    >
       {children}
-    </GrommetWrapper>
+    </Grommet>
   );
 };
-
-export default GlobalStyle;
