@@ -26,7 +26,7 @@ export type KeyType =
 export type Keys = KeyRecord[];
 
 export type UseKeysManagerHook = [
-  addKey: (record: KeyRecord) => void,
+  addKey: (record: KeyRecordRaw) => Promise<string | undefined>,
   updateKey: (record: KeyRecord) => void,
   removeKey: (tag: string) => void,
   revokeKey: (tag: string, reason:RevocationReason) => void,
@@ -94,10 +94,11 @@ export const useKeysManager = (): UseKeysManagerHook => {
 
   useEffect(() => {
     setLoading(false);
+    setError(undefined);
   }, [keys])
 
   const addKey = useCallback(
-    (rawRecord: KeyRecordRaw): void => {
+    async (rawRecord: KeyRecordRaw): Promise<string | undefined> => {
       try {
         setLoading(true);
         const record = {
@@ -124,6 +125,7 @@ export const useKeysManager = (): UseKeysManagerHook => {
             record
           }
         });
+        return record.id
       } catch(error) {
         logger.error(error);
         setError((error as Error).message || UNKNOWN_ERROR);
