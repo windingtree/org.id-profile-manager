@@ -16,7 +16,6 @@ export interface PageConfig {
   title: string;
   label: string;
   protected?: boolean;
-  children?: PageConfig[]
 }
 
 export const pagesConfig: PageConfig[] = [
