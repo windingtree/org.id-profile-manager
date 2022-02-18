@@ -4,7 +4,7 @@ import { generate } from 'grommet/themes/base';
 import { deepMerge } from 'grommet/utils';
 import { useAppState } from './store';
 
-const baseTheme = deepMerge(generate(16), grommet);
+const baseTheme = deepMerge(grommet, generate(16));
 
 export const GlobalStyle:React.FC = ({children}) => {
   const { themeMode } = useAppState();
@@ -13,7 +13,6 @@ export const GlobalStyle:React.FC = ({children}) => {
     <Grommet
       theme={baseTheme}
       themeMode={themeMode}
-      full
     >
       {children}
     </Grommet>

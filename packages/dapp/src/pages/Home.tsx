@@ -1,9 +1,8 @@
 import { Text } from 'grommet';
 import { useAppState } from '../store';
 import { PageWrapper } from '../pages/PageWrapper';
-
-// Config
 import { getNetworksNames } from '../config';
+import { DidResolverForm } from '../components/DidResolverForm';
 
 const allowedNetworksNames = getNetworksNames();
 
@@ -18,6 +17,7 @@ export const Home = () => {
           You are connected to a wrong network. Please switch to one of: {allowedNetworksNames.join(', ')}
         </Text>
       }
+      <DidResolverForm />
     </PageWrapper>
   );
 };
