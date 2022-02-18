@@ -52,7 +52,7 @@ Here is an example of protected route config:
 ```typescript
 {
   path: '/keys',
-  element: <Protected component={<Keys />} />,
+  element: <Keys />,
   title: 'Keys management',
   label: 'Keys',
   protected: true // <--
