@@ -5,22 +5,27 @@ import type {
   FetcherConfig,
   DidResolutionResponse
 } from '@windingtree/org.id-resolver';
+import type { ResolverHistoryRecordRaw } from '../store/actions';
 import {
   buildEvmChainConfig,
   buildHttpFetcherConfig,
   OrgIdResolver,
   buildDidResolutionResponse
 } from '@windingtree/org.id-resolver';
-import { regexp, uid, object } from '@windingtree/org.id-utils';
+import { regexp, object } from '@windingtree/org.id-utils';
 import { utils as ipfsNodeUtils } from '@windingtree/ipfs-apis';
 import { useCallback, useEffect, useState } from 'react';
 import { ethers } from 'ethers';
 import { getNetworkByChainId } from '../config';
-import { useAppDispatch, useAppState } from '../store';
-import { ResolverHistoryRecord } from '../store/actions';
+import { useAppState } from '../store';
+import { DidResolutionResult } from './useDidResolverHistory';
+import Logger from '../utils/logger';
+
+// Initialize logger
+const logger = Logger('useDidResolver');
 
 export type UseDidResolverHook = [
-  resolve: (did: string) => Promise<string>,
+  resolve: (did: string) => Promise<ResolverHistoryRecordRaw>,
   loading: boolean,
   error: string | undefined,
 ];
@@ -134,9 +139,7 @@ const getOrganizationNameFromResponse = (
 
 // useDidResolver react hook
 export const useDidResolver = (): UseDidResolverHook => {
-  const { resolverHistory } = useAppState();
-  const dispatch = useAppDispatch();
-  const { ipfsNode } = useAppState();
+  const { resolverHistory, ipfsNode } = useAppState();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | undefined>(undefined);
 
@@ -145,16 +148,17 @@ export const useDidResolver = (): UseDidResolverHook => {
   }, [resolverHistory]);
 
   const resolve = useCallback(
-    async (did: string) => {
-      const resolutionStart = Date.now();
-      const id = uid.simpleUid(8);
-      let resolutionResponse: DidResolutionResponse | undefined;
-
+    async (did: string): Promise<ResolverHistoryRecordRaw> => {
       setLoading(true);
+
+      const resolutionStart = Date.now();
+      let resolutionResponse: DidResolutionResponse | undefined;
 
       try {
         if (ipfsNode === undefined) {
-          throw new Error('Cannot start DID resolution. IPFS node is not accessible');
+          throw new Error(
+            'Cannot start DID resolution. IPFS node is not accessible'
+          );
         }
 
         resolutionResponse = await resolveDid(
@@ -164,46 +168,37 @@ export const useDidResolver = (): UseDidResolverHook => {
               ipfsNodeUtils.getIpfsChunks(ipfsNode.cat(cid))
           }
         );
+
+        setLoading(false);
+
+        return {
+          name: getOrganizationNameFromResponse(resolutionResponse),
+          date: resolutionResponse
+            ? resolutionResponse.didResolutionMetadata.retrieved
+            : new Date().toISOString(),
+          result: resolutionResponse
+            ? resolutionResponse.didResolutionMetadata.error
+              ? DidResolutionResult.Error
+              : DidResolutionResult.Ok
+            : DidResolutionResult.Error,
+          report: resolutionResponse
+            ? resolutionResponse
+            : buildDidResolutionResponse( // If resolution failed
+              did,
+              resolutionStart,
+              undefined,
+              undefined,
+              error
+            )
+        };
       } catch (error) {
+        logger.error(error);
         setError((error as Error).message || 'Unknown useDidResolver error');
         setLoading(false);
+        throw error;
       }
-
-      const record: ResolverHistoryRecord = {
-        id,
-        name: getOrganizationNameFromResponse(resolutionResponse),
-        date: resolutionResponse
-          ? resolutionResponse.didResolutionMetadata.retrieved
-          : new Date().toISOString(),
-        result: resolutionResponse
-          ? resolutionResponse.didResolutionMetadata.error
-            ? 'ERROR'
-            : 'OK'
-          : 'ERROR',
-        report: resolutionResponse
-          ? resolutionResponse
-          : buildDidResolutionResponse( // If resolution failed
-            did,
-            resolutionStart,
-            undefined,
-            undefined,
-            error
-          )
-      };
-
-      dispatch({
-        type: 'SET_RECORD',
-        payload: {
-          name: 'resolverHistory',
-          record
-        }
-      });
-
-      setLoading(false);
-
-      return record.id;
     },
-    [dispatch, ipfsNode, error]
+    [ipfsNode, error]
   );
 
   return [resolve, loading, error];
