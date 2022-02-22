@@ -1,11 +1,11 @@
 import type { ReactNode } from 'react';
-import type { Location } from 'react-router-dom';
+import type { RouteMatch } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import {
   useRoutes,
   useNavigate,
   useLocation,
-  resolvePath
+  matchRoutes
 } from 'react-router-dom';
 import { Menu } from 'grommet';
 import { Menu as MenuIcon } from 'grommet-icons';
@@ -15,12 +15,14 @@ import { Protected } from './Protected';
 // Pages
 import { Home } from '../pages/Home';
 import { Keys } from '../pages/Keys';
+import { ResolverHistory } from '../pages/ResolverHistory';
+import { ResolverHistoryDetails } from '../pages/ResolverHistoryDetails';
 
 export interface RouteConfig {
   path: string;
   element: ReactNode;
   title: string;
-  label: string;
+  label?: string;
   protected?: boolean;
 }
 
@@ -34,13 +36,26 @@ export const pagesRoutesConfig: Routes = [
     label: 'Home'
   },
   {
+    path: '/resolver',
+    element: <ResolverHistory />,
+    title: 'DID resolutions history',
+    label: 'DID resolutions',
+  },
+  {
     path: '/keys',
     element: <Keys />,
     title: 'Keys management',
     label: 'Keys',
     protected: true
-  }
+  },
+  {
+    path: '/resolver/:id',
+    element: <ResolverHistoryDetails />,
+    title: 'DID resolution report'
+  },
 ];
+
+export const UNKNOWN_PAGE_TITLE = '404';
 
 export const processPagesConfig = (config: Routes): Routes =>
   config.map(
@@ -52,29 +67,19 @@ export const processPagesConfig = (config: Routes): Routes =>
       : route
   );
 
-export const getPageTitle = (location: Location): any => {
-  let locationPathname = location.pathname;
-  const page = pagesRoutesConfig.find(
-    (route => {
-      const path = resolvePath(route.path);
-      const toPathname = path.pathname;
-      return locationPathname === toPathname ||
-        (
-          locationPathname.startsWith(toPathname) &&
-          locationPathname.charAt(toPathname.length) === '/'
-        );
-    })
-  );
-  return page?.title || '404';
-};
+export const getPageTitle = (routes: RouteMatch[] | null): string =>
+  routes
+    ? (routes[0].route as RouteConfig).title || UNKNOWN_PAGE_TITLE
+    : UNKNOWN_PAGE_TITLE;
 
 export const usePageTitle = (): string => {
   const location = useLocation();
-  const [title, setTitle] = useState('');
+  const [title, setTitle] = useState<string>('');
+  const matchedRoutes = matchRoutes(pagesRoutesConfig, location);
 
   useEffect(() => {
-    setTitle(getPageTitle(location));
-  }, [location]);
+    setTitle(getPageTitle(matchedRoutes));
+  }, [matchedRoutes]);
 
   return title;
 };
@@ -88,11 +93,21 @@ export const GlobalMenu = () => {
   const navigate = useNavigate();
 
   const buildMenuConfig = pagesRoutesConfig
-    .map(
-      (item) => ({
-        ...item,
-        onClick: () => navigate(item.path)
-      })
+    .reduce<Routes>(
+      (a, v) => ([
+        ...a,
+        ...(
+          v.label // Items without labels are ignored
+            ? [
+              {
+                ...v,
+                onClick: () => navigate(v.path)
+              }
+            ]
+            : []
+        )
+      ]),
+      []
     );
 
   return (
