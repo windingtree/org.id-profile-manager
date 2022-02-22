@@ -27,6 +27,7 @@ export type ResolutionResult =
 export interface ResolverHistoryRecord extends GenericStateRecord {
 	name: string;
 	date: string; // date-time ISO
+  did: string;
 	result: ResolutionResult;
 	report: DidResolutionResponse;
 }
