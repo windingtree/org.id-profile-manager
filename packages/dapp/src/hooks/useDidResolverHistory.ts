@@ -1,7 +1,7 @@
 import type { AnySchema } from '@windingtree/org.id-utils/dist/object';
 import type {
-  GenericStateRecord,
-  ResolverHistoryRecordRaw
+  ResolverHistoryRecordRaw,
+  ResolverHistoryRecord
 } from '../store/actions';
 import { useCallback, useEffect, useState } from 'react';
 import resolutionResponseSchema from '@windingtree/org.id-resolver/dist/responseSchema.json';
@@ -40,6 +40,9 @@ export const historyRecordSchema: AnySchema = {
         name: {
           type: 'string'
         },
+        did: {
+          type: 'string'
+        },
         date: {
           type: 'string',
           format: 'date-time'
@@ -49,17 +52,18 @@ export const historyRecordSchema: AnySchema = {
           enum: Object.values(DidResolutionResult)
         },
         report: {
-          type: 'string'
+          "$ref": "#/definitions/DidResponse"
         }
       },
       required: [
         'name',
         'date',
+        'did',
         'result',
         'report'
       ]
     },
-    DidResponse: resolutionResponseSchema.definitions.DidResponse
+    ...resolutionResponseSchema.definitions
   }
 }
 
@@ -71,8 +75,16 @@ const validateRecordWithSchema = (record: ResolverHistoryRecordRaw): string | nu
   );
 
 // Getting of record from a set
-const getRecordById = (records: GenericStateRecord[], id: string): GenericStateRecord | undefined =>
+export const getRecordById = (
+  records: ResolverHistoryRecord[],
+  id: string
+): ResolverHistoryRecord | undefined =>
   records.find(r => r.id === id);
+
+export const getRecordByDid = (
+  history: ResolverHistoryRecord[], did: string
+): ResolverHistoryRecord | undefined  =>
+  history.find(r => r.did === did);
 
 // useDidResolverHistory react hook
 export const useDidResolverHistory = (): UseDidResolverHistoryHook => {
@@ -89,6 +101,7 @@ export const useDidResolverHistory = (): UseDidResolverHistoryHook => {
     try {
       setLoading(true);
       const validationResult = validateRecordWithSchema(record);
+      logger.debug('add:validationResult', validationResult);
 
       if (validationResult !== null) {
         throw new Error(
@@ -108,10 +121,13 @@ export const useDidResolverHistory = (): UseDidResolverHistoryHook => {
         }
       });
 
-      logger.debug('Added record', {
-        id,
-        ...record
-      });
+      logger.debug(
+        'Added record',
+        {
+          id,
+          ...record
+        }
+      );
       return id;
     } catch (error) {
       logger.error(error);
@@ -124,6 +140,7 @@ export const useDidResolverHistory = (): UseDidResolverHistoryHook => {
     try {
       setLoading(true);
       const targetRecord = getRecordById(resolverHistory, id);
+      logger.debug('remove:targetRecord', targetRecord);
 
       if (!targetRecord) {
         throw new Error(`Resolution record with id: ${id} does not exists`);
