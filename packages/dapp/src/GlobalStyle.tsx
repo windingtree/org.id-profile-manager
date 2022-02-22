@@ -11,6 +11,7 @@ export const GlobalStyle:React.FC = ({children}) => {
 
   return (
     <Grommet
+      full
       theme={baseTheme}
       themeMode={themeMode}
     >
