@@ -1,6 +1,6 @@
 import { useContext } from 'react';
 import { useNavigate, useLocation, Navigate } from 'react-router-dom';
-import { Avatar, Header, Heading, Box, ResponsiveContext } from 'grommet';
+import { Image, Header, Heading, Box, ResponsiveContext } from 'grommet';
 import { useAppState } from '../store';
 import { Account } from '../components/Account';
 import { SignInButton, SignOutButton } from '../components/buttons/web3Modal';
@@ -19,22 +19,29 @@ export const AppHeader = () => {
     <Header
       background='light-1'
       pad={size}
+      responsive={true}
     >
       {(returnLocation && account) &&
         <Navigate to={returnLocation} state={null} />
       }
       <Box direction='row' align='center' gap={size}>
-        <Avatar src='wt-logo.png' onClick={() => navigate('/')}/>
+        <Image
+          src='/wt-logo.png'
+          fit='cover'
+          width='40rem'
+          height='40rem'
+          onClick={() => navigate('/')}
+        />
         <Heading size='small'>{title}</Heading>
       </Box>
       <Box direction='row' align='center' gap={size}>
         <Account account={account} />
-        <>
+        <Box>
           {account
             ? <SignOutButton />
             : <SignInButton />
           }
-        </>
+        </Box>
         <GlobalMenu />
         <SwitchThemeMode />
       </Box>
