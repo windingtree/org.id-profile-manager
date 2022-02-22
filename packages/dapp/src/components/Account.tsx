@@ -1,7 +1,13 @@
+import { useContext } from 'react';
+import { useState } from 'react';
 import Blockies from 'react-blockies';
 import styled from 'styled-components';
-import { Box, Text } from 'grommet';
+import { Box, Text, Notification, ResponsiveContext } from 'grommet';
 import { centerEllipsis, copyToClipboard } from '../utils/strings';
+import Logger from '../utils/logger';
+
+// Initialize logger
+const logger = Logger('Account');
 
 export interface AccountProps {
   account?: string;
@@ -17,23 +23,42 @@ const AccountHash = styled(Text)`
 `;
 
 export const Account = ({ account }: AccountProps) => {
+  const size = useContext(ResponsiveContext);
+  const [notification, setNotification] = useState<boolean>(false);
 
   if (!account) {
     return null;
   }
 
   return (
-    <Box direction='row' align='center' pad='small'>
+    <Box
+      direction='row'
+      align='center'
+      pad='small'
+      onClick={() => {
+        copyToClipboard(account);
+        logger.debug('Copied to clipboard', account);
+        setNotification(true);
+        setTimeout(() => setNotification(false), 1000);
+      }}
+    >
       <AccountIcon
         seed={account}
         size={7}
         scale={4}
       />
-      <AccountHash
-        onClick={() => copyToClipboard(account)}
-      >
-        {centerEllipsis(account)}
-      </AccountHash>
+      {size !== 'small' &&
+        <AccountHash>
+          {centerEllipsis(account)}
+        </AccountHash>
+      }
+      {notification &&
+        <Notification
+          toast
+          title='Copied to clipboard'
+          status='normal'
+        />
+      }
     </Box>
   );
 };
