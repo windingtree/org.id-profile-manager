@@ -3401,6 +3401,11 @@
   resolved "https://registry.yarnpkg.com/@types/json5/-/json5-0.0.29.tgz#ee28707ae94e11d2b827bcbe5270bcea7f3e71ee"
   integrity sha1-7ihweulOEdK4J7y+UnC86n8+ce4=
 
+"@types/luxon@2.0.9":
+  version "2.0.9"
+  resolved "https://registry.yarnpkg.com/@types/luxon/-/luxon-2.0.9.tgz#782a0edfa6d699191292c13168bd496cd66b87c6"
+  integrity sha512-ZuzIc7aN+i2ZDMWIiSmMdubR9EMMSTdEzF6R+FckP4p6xdnOYKqknTo/k+xXQvciSXlNGIwA4OPU5X7JIFzYdA==
+
 "@types/mdast@^3.0.0":
   version "3.0.10"
   resolved "https://registry.yarnpkg.com/@types/mdast/-/mdast-3.0.10.tgz#4724244a82a4598884cbbe9bcfd73dff927ee8af"
@@ -4074,10 +4079,10 @@
     "@windingtree/org.id-utils" "^1.0.0-beta.47"
     ethers "5.5.1"
 
-"@windingtree/org.id-resolver@3.0.0-beta.19":
-  version "3.0.0-beta.19"
-  resolved "https://registry.yarnpkg.com/@windingtree/org.id-resolver/-/org.id-resolver-3.0.0-beta.19.tgz#1ef65d2f0cebe266a58f58eaa2675510ab90a7ba"
-  integrity sha512-awrHAtqbyXNoHk22dMbCRnMdyY6kKIIt7nRoFdZHfup/QoJTyH1I1YsoHFLi4IRUa4dsIE/35Lhj08RlwuxqlA==
+"@windingtree/org.id-resolver@3.0.0-beta.20":
+  version "3.0.0-beta.20"
+  resolved "https://registry.yarnpkg.com/@windingtree/org.id-resolver/-/org.id-resolver-3.0.0-beta.20.tgz#6f691ea22f587cf5a7403de5ae1b1d12ffb83961"
+  integrity sha512-QrV7yT66Szrs0ZqQOewcDduv7HGHfIc0O4EPNsk3cZBAr/xmTogVBnOO/35HDnOQl+g+oFz22aJ0JMqHu6UplA==
   dependencies:
     "@windingtree/org.id" "^3.0.0-beta.6"
     "@windingtree/org.id-auth" "^1.0.0-beta.47"
@@ -13337,10 +13342,10 @@ react-error-boundary@^3.1.0:
   dependencies:
     "@babel/runtime" "^7.12.5"
 
-react-error-overlay@^6.0.9:
-  version "6.0.10"
-  resolved "https://registry.yarnpkg.com/react-error-overlay/-/react-error-overlay-6.0.10.tgz#0fe26db4fa85d9dbb8624729580e90e7159a59a6"
-  integrity sha512-mKR90fX7Pm5seCOfz8q9F+66VCc1PGsWSBxKbITjfKVQHMNF2zudxHnMdJiB1fRCb+XsbQV9sO9DCkgsMQgBIA==
+react-error-overlay@6.0.9, react-error-overlay@^6.0.9:
+  version "6.0.9"
+  resolved "https://registry.yarnpkg.com/react-error-overlay/-/react-error-overlay-6.0.9.tgz#3c743010c9359608c375ecd6bc76f35d93995b0a"
+  integrity sha512-nQTTcUu+ATDbrSD1BZHr5kgSD4oF8OFjxun8uAaL8RwPBacGBNPf/yAuVVdx17N8XNzRDMrZ9XcKZHCjPW+9ew==
 
 react-fast-compare@^3.0.1, react-fast-compare@^3.2.0:
   version "3.2.0"
