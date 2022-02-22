@@ -5,7 +5,11 @@ import type {
   FetcherConfig,
   DidResolutionResponse
 } from '@windingtree/org.id-resolver';
-import type { ResolverHistoryRecordRaw } from '../store/actions';
+import type { IPFS } from '@windingtree/ipfs-apis';
+import type {
+  ResolverHistoryRecordRaw,
+  ResolverHistoryRecord
+} from '../store/actions';
 import {
   buildEvmChainConfig,
   buildHttpFetcherConfig,
@@ -18,7 +22,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { ethers } from 'ethers';
 import { getNetworkByChainId } from '../config';
 import { useAppState } from '../store';
-import { DidResolutionResult } from './useDidResolverHistory';
+import { DidResolutionResult, getRecordByDid } from './useDidResolverHistory';
 import Logger from '../utils/logger';
 
 // Initialize logger
@@ -56,6 +60,29 @@ export interface DidResolverOptions {
 
 const UNKNOWN_ORGID = 'Unknown organization';
 
+export const ipfsCidResolver = (ipfsNode: IPFS) => async (cid: string) => {
+  try {
+    const rawResource = await Promise.race([
+      ipfsNodeUtils.getIpfsChunks(ipfsNode.cat(cid)),
+      new Promise(
+        (_, reject) => setTimeout(
+          () => reject(new Error(`Timeout occurred during getting cid: ${cid}`)),
+          70000 // @todo Move timeout value to the Dapp configuration
+        )
+      )
+    ]) as string;
+
+    try {
+      return JSON.parse(rawResource);
+    } catch (error) {
+      throw new Error(`Unable to parse ORGiD VC from the CID: ${cid}`);
+    }
+  } catch (error) {
+    logger.debug('ipfsCidResolver', error);
+    throw error;
+  }
+};
+
 // @todo Move this helper to the SDK utility
 export const parseDid = (did: string): ParsedDid => {
   const groupedCheck = regexp.didGrouped.exec(did) as DidGroupedCheckResult;
@@ -82,7 +109,7 @@ export const parseDid = (did: string): ParsedDid => {
   };
 };
 
-const resolveDid = async (
+export const resolveDid = async (
   did: string,
   {
     getIpfsResource
@@ -125,7 +152,7 @@ const resolveDid = async (
 };
 
 // @todo Improve typings for object.getDeepValue
-const getOrganizationNameFromResponse = (
+export const getOrganizationNameFromResponse = (
   response: {} | undefined
 ): string => {
   if (response === undefined) {
@@ -148,10 +175,21 @@ export const useDidResolver = (): UseDidResolverHook => {
   }, [resolverHistory]);
 
   const resolve = useCallback(
-    async (did: string): Promise<ResolverHistoryRecordRaw> => {
+    async (did: string): Promise<ResolverHistoryRecordRaw | ResolverHistoryRecord> => {
       setLoading(true);
 
+      // Try to get result from history
+      const existedResult = getRecordByDid(resolverHistory, did);
+      logger.debug('existedResult', existedResult);
+
+      if (!!existedResult) {
+        // @todo Implement resolution history record expiration check
+        setLoading(false);
+        return existedResult;
+      }
+
       const resolutionStart = Date.now();
+      let resolveDidError: string | undefined;
       let resolutionResponse: DidResolutionResponse | undefined;
 
       try {
@@ -164,41 +202,43 @@ export const useDidResolver = (): UseDidResolverHook => {
         resolutionResponse = await resolveDid(
           did,
           {
-            getIpfsResource: (cid: string) =>
-              ipfsNodeUtils.getIpfsChunks(ipfsNode.cat(cid))
+            getIpfsResource: ipfsCidResolver(ipfsNode)
           }
         );
-
-        setLoading(false);
-
-        return {
-          name: getOrganizationNameFromResponse(resolutionResponse),
-          date: resolutionResponse
-            ? resolutionResponse.didResolutionMetadata.retrieved
-            : new Date().toISOString(),
-          result: resolutionResponse
-            ? resolutionResponse.didResolutionMetadata.error
-              ? DidResolutionResult.Error
-              : DidResolutionResult.Ok
-            : DidResolutionResult.Error,
-          report: resolutionResponse
-            ? resolutionResponse
-            : buildDidResolutionResponse( // If resolution failed
-              did,
-              resolutionStart,
-              undefined,
-              undefined,
-              error
-            )
-        };
-      } catch (error) {
-        logger.error(error);
-        setError((error as Error).message || 'Unknown useDidResolver error');
-        setLoading(false);
-        throw error;
+      } catch (err) {
+        logger.error(err);
+        resolveDidError = (err as Error).message || 'Unknown useDidResolver error';
+        setError(resolveDidError);
       }
+
+      // Creating of a raw history record
+      const newHistoryRecord = {
+        name: getOrganizationNameFromResponse(resolutionResponse),
+        date: resolutionResponse
+          ? resolutionResponse.didResolutionMetadata.retrieved
+          : new Date().toISOString(),
+        did,
+        result: resolutionResponse
+          ? resolutionResponse.didResolutionMetadata.error
+            ? DidResolutionResult.Error
+            : DidResolutionResult.Ok
+          : DidResolutionResult.Error,
+        report: resolutionResponse
+          ? resolutionResponse
+          : buildDidResolutionResponse( // If resolution failed
+            did,
+            resolutionStart,
+            undefined,
+            undefined,
+            resolveDidError
+          )
+      };
+
+      setLoading(false);
+      logger.debug('newHistoryRecord', newHistoryRecord);
+      return newHistoryRecord;
     },
-    [ipfsNode, error]
+    [ipfsNode, resolverHistory]
   );
 
   return [resolve, loading, error];
