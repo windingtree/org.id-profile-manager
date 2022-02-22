@@ -1,25 +1,29 @@
+import type { ReactNode } from 'react';
 import { useContext } from 'react';
-import { Box, Text, Button, ResponsiveContext } from 'grommet';
+import { Box, Button, ResponsiveContext } from 'grommet';
 import { StatusInfo, Alert } from 'grommet-icons';
 
 export type MessageBoxTypes =
  | 'info'
+ | 'warn'
  | 'error';
 
 export interface MessageBoxProps {
   type: MessageBoxTypes;
-  message?: string;
+  show: boolean;
+  children?: ReactNode;
   onClose?: () => void
 }
 
 export const MessageBox = ({
   type = 'info',
-  message,
+  show = false,
+  children,
   onClose
 }: MessageBoxProps) => {
   const size = useContext(ResponsiveContext);
 
-  if (!message) {
+  if (!show) {
     return null;
   }
 
@@ -35,13 +39,16 @@ export const MessageBox = ({
         {type === 'info' &&
           <StatusInfo color='status-ok' size={size} />
         }
+        {type === 'warn' &&
+          <Alert color='status-warning' size={size} />
+        }
         {type === 'error' &&
           <Alert color='status-error' size={size} />
         }
       </Box>
-      <Box direction='column'>
+      <Box direction='column' gap={size}>
         <Box>
-          <Text>{message}</Text>
+          {children}
         </Box>
         {typeof onClose === 'function' &&
           <Box>
