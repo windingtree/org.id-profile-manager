@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import type { ResolverHistoryRecord } from '../store/actions';
 import type { NetworkInfo } from '../config';
-import { useEffect, useState, useContext } from 'react';
+import { useEffect, useState, useContext, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 import { Grid, Box, Image, Text, NameValueList, NameValuePair, Button, ResponsiveContext } from 'grommet';
 import { object } from '@windingtree/org.id-utils';
@@ -103,41 +103,44 @@ export const getOrgIdNetwork = (record: ResolverHistoryRecord | undefined): Netw
 };
 
 export const TopInfoSet = ({ record, size }: TopValuesSetProps) => {
-  const network = getOrgIdNetwork(record);
-  const owner = getOrgIdOwner(record);
-  const tokenId = getOrgIdNft(record);
+  const network = useMemo(() => getOrgIdNetwork(record), [record]);
+  const owner = useMemo(() => getOrgIdOwner(record), [record]);
+  const tokenId = useMemo(() => getOrgIdNft(record), [record]);
 
-  const values: Record<string, string | number | ReactNode> = {
-    DID: (
-      <CopyText
-        text={record.did}
-        width={15}
-        prefixWidth={3}
-        size={size}
-      />
-    ),
-    Created: getOrgIdCreation(record),
-    Network: network ? `${network.name} (#${network.chainId})` : 'Unknown',
-    NFT: (
-      <Box direction='row' align='center'>
-        {`${tokenId !== 'Unknown' ? '#' + tokenId : tokenId}`}&nbsp;
-        <ExternalLink
-          href={`${network?.blockExplorer}/address/${network?.address}#code`}
-          label='contract'
+  const values: Record<string, string | number | ReactNode> = useMemo(
+    () => ({
+      DID: (
+        <CopyText
+          text={record.did}
+          width={15}
+          prefixWidth={3}
+          size={size}
         />
-      </Box>
-    ),
-    Owner: (
-      owner !== 'Unknown'
-        ? <ExternalLink
-          href={`${network?.blockExplorer}/address/${owner}`}
-          label={centerEllipsis(owner)}
-        />
-        : 'Unknown'
-    ),
-    Name: record.name,
-    Type: getOrganizationType(record)
-  };
+      ),
+      Created: getOrgIdCreation(record),
+      Network: network ? `${network.name} (#${network.chainId})` : 'Unknown',
+      NFT: (
+        <Box direction='row' align='center'>
+          {`${tokenId !== 'Unknown' ? '#' + tokenId : tokenId}`}&nbsp;
+          <ExternalLink
+            href={`${network?.blockExplorer}/address/${network?.address}#code`}
+            label='contract'
+          />
+        </Box>
+      ),
+      Owner: (
+        owner !== 'Unknown'
+          ? <ExternalLink
+            href={`${network?.blockExplorer}/address/${owner}`}
+            label={centerEllipsis(owner)}
+          />
+          : 'Unknown'
+      ),
+      Name: record.name,
+      Type: getOrganizationType(record)
+    }),
+    [network, owner, record, size, tokenId]
+  );
 
   return (
     <Box width='auto'>

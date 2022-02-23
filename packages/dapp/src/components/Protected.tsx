@@ -13,6 +13,7 @@ export const Protected = ({
   }: ProtectedProps) => {
   const location = useLocation();
   const { account } = useAppState();
+
   return (
     <>
       {

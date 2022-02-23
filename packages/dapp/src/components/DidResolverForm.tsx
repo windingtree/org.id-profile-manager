@@ -26,8 +26,7 @@ export const DidResolverForm = () => {
   const navigate = useNavigate();
   const { ipfsNode, isIpfsNodeConnecting } = useAppState();
   const [resolve, resolverWorking, resolverError] = useDidResolver();
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [addHistoryRecord, _, historyLoading, historyError] = useDidResolverHistory();
+  const [addHistoryRecord,, historyLoading, historyError] = useDidResolverHistory();
   const [processing, setProcessing] = useState(false);
   const [value, setValue] = useState<DidResolverFormData>(defaultResolverForm);
   const [error, setError] = useState<string | undefined>(undefined);
@@ -98,9 +97,20 @@ export const DidResolverForm = () => {
           <TextInput id='text-input-id' name='did' />
         </FormField>
         <Box direction='row' align='center' gap={size}>
-          <Button size='large' type='submit' primary label='Resolve' disabled={processing || !!!ipfsNode} />
-          <Button size='large' type='reset' label='Reset' disabled={processing} />
-          {processing &&
+          <Button
+            primary
+            size='large'
+            type='submit'
+            label='Resolve'
+            disabled={processing || !!!ipfsNode || historyLoading}
+          />
+          <Button
+            size='large'
+            type='reset'
+            label='Reset'
+            disabled={processing}
+          />
+          {(processing || historyLoading) &&
             <Spinner />
           }
         </Box>

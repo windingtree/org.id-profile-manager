@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import type { ResolutionResult, ResolverHistoryRecord } from '../store/actions';
-import { useContext, useState, useEffect } from 'react';
+import { useContext, useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Grid, Box, Text, Anchor, Spinner, ResponsiveContext } from 'grommet';
 import { Trash } from 'grommet-icons';
@@ -31,6 +31,16 @@ export const TrashIcon = styled(Trash)`
   cursor: pointer;
 `;
 
+const sortRecordsByDate = (
+  records: ResolverHistoryRecord[],
+  type: SortType
+): ResolverHistoryRecord[] => records.sort(
+  (a, b) =>
+    type === 'asc'
+      ? DateTime.fromISO(a.date) > DateTime.fromISO(b.date) ? 1 : -1
+      : DateTime.fromISO(a.date) < DateTime.fromISO(b.date) ? 1 : -1
+);
+
 export const ResolverHistory = () => {
   const size = useContext(ResponsiveContext);
   const navigate = useNavigate();
@@ -43,14 +53,9 @@ export const ResolverHistory = () => {
     setSelectedRecord(undefined);
   }, [resolverHistory]);
 
-  const sortRecordsByDate = (
-    records: ResolverHistoryRecord[],
-    type: SortType
-  ): ResolverHistoryRecord[] => records.sort(
-    (a, b) =>
-      type === 'asc'
-        ? DateTime.fromISO(a.date) > DateTime.fromISO(b.date) ? 1 : -1
-        : DateTime.fromISO(a.date) < DateTime.fromISO(b.date) ? 1 : -1
+  const recordsSortedByDate = useMemo(
+    () => sortRecordsByDate(resolverHistory, 'desc'),
+    [resolverHistory]
   );
 
   return (
@@ -77,7 +82,8 @@ export const ResolverHistory = () => {
           <Text size={size} weight='bold'>Result</Text>
           <Text size={size} weight='bold'></Text>
         </Grid>
-        {sortRecordsByDate(resolverHistory, 'desc').map(
+
+        {recordsSortedByDate.map(
           (record, i) => (
             <Grid
               fill='horizontal'
@@ -111,6 +117,7 @@ export const ResolverHistory = () => {
             </Grid>
           )
         )}
+
         <Confirmation
           show={selectedRecord !== undefined}
           title='Removal confirmation'

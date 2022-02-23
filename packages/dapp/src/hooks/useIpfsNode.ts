@@ -11,7 +11,7 @@ export type UseIpfsNode = [
 ];
 
 // useIpfsNode react hook
-export const useIpfsNode = (silent = false): UseIpfsNode => {
+export const useIpfsNode = (): UseIpfsNode => {
   const [node, setNode] = useState<IPFS | undefined>(undefined);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | undefined>(undefined);
@@ -35,7 +35,7 @@ export const useIpfsNode = (silent = false): UseIpfsNode => {
     if (ipfsNode !== undefined) {
       await ipfsNode.stop();
     }
-  }
+  };
 
   const stop = useCallback(async (): Promise<void> => {
     if (node !== undefined) {
@@ -52,14 +52,11 @@ export const useIpfsNode = (silent = false): UseIpfsNode => {
   }, [node]);
 
   useEffect(() => {
-    if (!silent) {
-      const ipfsNodePromise = start();
-      return () => {
-        doStop(ipfsNodePromise);
-      };
-    }
-
-  }, [silent, start]);
+    const ipfsNodePromise = start();
+    return () => {
+      doStop(ipfsNodePromise);
+    };
+  }, [start]);
 
   return [node, start, stop, loading, error];
 };

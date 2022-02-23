@@ -1,5 +1,5 @@
 import { useContext } from 'react';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import Blockies from 'react-blockies';
 import styled from 'styled-components';
 import { Box, Text, Notification, ResponsiveContext } from 'grommet';
@@ -25,6 +25,7 @@ const AccountHash = styled(Text)`
 export const Account = ({ account }: AccountProps) => {
   const size = useContext(ResponsiveContext);
   const [notification, setNotification] = useState<boolean>(false);
+  const shortAccount = useMemo(() => centerEllipsis(account || ''), [account]);
 
   if (!account) {
     return null;
@@ -49,7 +50,7 @@ export const Account = ({ account }: AccountProps) => {
       />
       {size !== 'small' &&
         <AccountHash>
-          {centerEllipsis(account)}
+          {shortAccount}
         </AccountHash>
       }
       {notification &&

@@ -1,11 +1,12 @@
-import { useContext } from 'react';
+import { useContext, useMemo } from 'react';
 import { useNavigate, useLocation, Navigate } from 'react-router-dom';
 import { Image, Header, Heading, Box, ResponsiveContext } from 'grommet';
 import { useAppState } from '../store';
+import { usePageTitle } from '../hooks/usePageTitle';
 import { Account } from '../components/Account';
 import { SignInButton, SignOutButton } from '../components/buttons/web3Modal';
 import { SwitchThemeMode } from './SwitchThemeMode';
-import { GlobalMenu, usePageTitle } from './Routes';
+import { GlobalMenu } from './Routes';
 
 export const AppHeader = () => {
   const size = useContext(ResponsiveContext);
@@ -13,7 +14,10 @@ export const AppHeader = () => {
   const navigate = useNavigate();
   const { account } = useAppState();
   const title = usePageTitle();
-  const returnLocation = (state as any)?.location as Location;
+  const returnLocation = useMemo(
+    () => (state as any)?.location as Location,
+    [state]
+  );
 
   return (
     <Header

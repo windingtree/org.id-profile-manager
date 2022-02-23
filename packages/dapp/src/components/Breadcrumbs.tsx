@@ -1,5 +1,6 @@
 import type { TextProps } from 'grommet';
 import { Nav, Anchor } from 'grommet';
+import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FormPrevious } from 'grommet-icons';
 
@@ -16,6 +17,21 @@ export interface BreadcrumbsProps {
 export const Breadcrumbs = ({ breadcrumbs, size }: BreadcrumbsProps) =>{
   const navigate = useNavigate();
 
+  const items = useMemo(
+    () => (breadcrumbs || []).map(
+      ({ path, label }, i) => (
+        <Anchor
+          key={i}
+          label={label}
+          onClick={() => navigate(path)}
+          icon={<FormPrevious/>}
+          gap='xsmall'
+        />
+      )
+    ),
+    [navigate, breadcrumbs]
+  );
+
   if (breadcrumbs === undefined || breadcrumbs.length === 0) {
     return null;
   }
@@ -28,17 +44,7 @@ export const Breadcrumbs = ({ breadcrumbs, size }: BreadcrumbsProps) =>{
         bottom: size
       }}
     >
-      {breadcrumbs.map(
-        ({ path, label }, i) => (
-          <Anchor
-            key={i}
-            label={label}
-            onClick={() => navigate(path)}
-            icon={<FormPrevious/>}
-            gap='xsmall'
-          />
-        )
-      )}
+      {items}
     </Nav>
   );
 };
