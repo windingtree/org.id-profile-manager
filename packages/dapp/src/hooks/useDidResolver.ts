@@ -182,7 +182,7 @@ export const useDidResolver = (): UseDidResolverHook => {
       const existedResult = getRecordByDid(resolverHistory, did);
       logger.debug('existedResult', existedResult);
 
-      if (!!existedResult) {
+      if (!!existedResult && existedResult.result !== 'ERROR') {
         // @todo Implement resolution history record expiration check
         setLoading(false);
         return existedResult;
