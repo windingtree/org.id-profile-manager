@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import type { ResolutionResult } from '../store/actions';
+import type { ResolutionResult, ResolverHistoryRecord } from '../store/actions';
 import { useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Grid, Box, Text, Anchor, Spinner, ResponsiveContext } from 'grommet';
@@ -16,6 +16,10 @@ import Logger from '../utils/logger';
 
 // Initialize logger
 const logger = Logger('ResolverHistory');
+
+export type SortType =
+  | 'asc'
+  | 'desc';
 
 export const parseResolutionResult = (result: ResolutionResult): ReactNode => (
   <Text color={
@@ -38,6 +42,16 @@ export const ResolverHistory = () => {
   useEffect(() => {
     setSelectedRecord(undefined);
   }, [resolverHistory]);
+
+  const sortRecordsByDate = (
+    records: ResolverHistoryRecord[],
+    type: SortType
+  ): ResolverHistoryRecord[] => records.sort(
+    (a, b) =>
+      type === 'asc'
+        ? DateTime.fromISO(a.date) > DateTime.fromISO(b.date) ? 1 : -1
+        : DateTime.fromISO(a.date) < DateTime.fromISO(b.date) ? 1 : -1
+  );
 
   return (
     <PageWrapper
@@ -63,7 +77,7 @@ export const ResolverHistory = () => {
           <Text size={size} weight='bold'>Result</Text>
           <Text size={size} weight='bold'></Text>
         </Grid>
-        {resolverHistory.map(
+        {sortRecordsByDate(resolverHistory, 'desc').map(
           (record, i) => (
             <Grid
               fill='horizontal'
