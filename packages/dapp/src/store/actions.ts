@@ -42,7 +42,7 @@ export interface State {
   injectedProvider?: IProviderInfo;
   account?: string;
   signIn: Function;
-  signOut: Function;
+  logout: Function;
   errors: string[];
   themeMode: ThemeMode;
   ipfsNode?: IPFS;
@@ -88,7 +88,7 @@ export interface SetWeb3modalFunctionsAction {
   type: 'SET_WEB3MODAL_FUNCTIONS',
   payload: {
     signIn: Function;
-    signOut: Function;
+    logout: Function;
   }
 }
 

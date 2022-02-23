@@ -3,7 +3,7 @@ import { useNavigate, useLocation, Navigate } from 'react-router-dom';
 import { Image, Header, Heading, Box, ResponsiveContext } from 'grommet';
 import { useAppState } from '../store';
 import { Account } from '../components/Account';
-import { SignInButton, SignOutButton } from '../components/buttons/web3Modal';
+import { SignInButton, LogoutButton } from '../components/buttons/web3Modal';
 import { SwitchThemeMode } from './SwitchThemeMode';
 import { GlobalMenu, usePageTitle } from './Routes';
 
@@ -38,7 +38,7 @@ export const AppHeader = () => {
         <Account account={account} />
         <Box>
           {account
-            ? <SignOutButton />
+            ? <LogoutButton />
             : <SignInButton />
           }
         </Box>

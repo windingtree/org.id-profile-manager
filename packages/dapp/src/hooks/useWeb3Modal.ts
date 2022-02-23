@@ -3,6 +3,7 @@ import { useMemo, useCallback, useEffect, useState } from 'react';
 import { ethers } from 'ethers';
 import Web3modal from 'web3modal';
 import Logger from '../utils/logger';
+import { useNavigate } from "react-router-dom";
 
 // Initialize logger
 const logger = Logger('useWeb3Modal');
@@ -16,7 +17,7 @@ export type  Web3ModalHook = [
   injectedProvider: IProviderInfo | undefined,
   isConnecting: boolean,
   signIn: Function,
-  signOut: Function,
+  logout: Function,
   error: string | null
 ];
 
@@ -26,6 +27,7 @@ export const useWeb3Modal = (web3ModalConfig: Web3ModalConfig): Web3ModalHook =>
   const [injectedProvider, setInjectedProvider] = useState<IProviderInfo | undefined>();
   const [isConnecting, setIsConnecting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   // Web3Modal initialization
   const web3Modal = useMemo(
@@ -33,13 +35,24 @@ export const useWeb3Modal = (web3ModalConfig: Web3ModalConfig): Web3ModalHook =>
     [web3ModalConfig]
   );
 
-  const signOut = useCallback(() => {
+  // TODO: Further investigate sign out issue when using walletconnect:
+  //       https://github.com/Web3Modal/web3modal/issues/354
+  const logout = useCallback(() => {
     web3Modal.clearCachedProvider();
     setProvider(undefined);
-    // SignOut issue when using walletconnect: https://github.com/Web3Modal/web3modal/issues/354
+
+    // TODO:
+    //   1. get encryption key, store as "password" variable
+    //   2. build data to save, store as "storedState" variable;
+    //      this will be used with "setState()" from "src/store/localStorage.ts"
+    //   3. invoke function "setState( storedState, transform )", where "transform" is defined as:
+    //         const transform = str => encrypt(str, password);
+    //   4. clear plaintext Local Storage data.
+
+    navigate('/');
+
     logger.info(`Logged Out`);
-    // window.location.reload();
-  }, [web3Modal]);
+  }, [web3Modal, navigate]);
 
   const signIn = useCallback(async () => {
     try {
@@ -74,7 +87,7 @@ export const useWeb3Modal = (web3ModalConfig: Web3ModalConfig): Web3ModalHook =>
       // Subscribe to provider disconnection
       web3ModalProvider.on('disconnect', (code: number, reason: string) => {
         logger.info(`Disconnected with code: ${code} and reason: ${reason}`);
-        signOut();
+        logout();
       });
 
       logger.info(`Logged In`);
@@ -88,7 +101,7 @@ export const useWeb3Modal = (web3ModalConfig: Web3ModalConfig): Web3ModalHook =>
         logger.error('Unknown error');
       }
     }
-  }, [web3Modal, signOut]);
+  }, [web3Modal, logout]);
 
   useEffect(() => {
     if (!provider && web3Modal.cachedProvider) {
@@ -103,7 +116,7 @@ export const useWeb3Modal = (web3ModalConfig: Web3ModalConfig): Web3ModalHook =>
     injectedProvider,
     isConnecting,
     signIn,
-    signOut,
+    logout,
     error
   ];
 };

@@ -54,7 +54,7 @@ export const mainReducer = (state: State, action: Action): State => {
         return {
           ...state,
           signIn: action.payload.signIn,
-          signOut: action.payload.signOut
+          logout: action.payload.logout
         };
       case 'SET_IPFS_NODE_CONNECTING':
         return {
@@ -145,7 +145,7 @@ const initialState: State = {
   isRightNetwork: true,
   isIpfsNodeConnecting: false,
   signIn: () => {},
-  signOut: () => {},
+  logout: () => {},
   errors: [],
   themeMode:ThemeMode.light,
   startIpfsNode: () => {},
