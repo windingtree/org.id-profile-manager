@@ -4,7 +4,7 @@ import { Image, Header, Heading, Box, ResponsiveContext } from 'grommet';
 import { useAppState } from '../store';
 import { usePageTitle } from '../hooks/usePageTitle';
 import { Account } from '../components/Account';
-import { SignInButton, SignOutButton } from '../components/buttons/web3Modal';
+import { SignInButton, LogoutButton } from '../components/buttons/web3Modal';
 import { SwitchThemeMode } from './SwitchThemeMode';
 import { GlobalMenu } from './Routes';
 
@@ -42,7 +42,7 @@ export const AppHeader = () => {
         <Account account={account} />
         <Box>
           {account
-            ? <SignOutButton />
+            ? <LogoutButton />
             : <SignInButton />
           }
         </Box>

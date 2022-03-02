@@ -2,8 +2,8 @@ import type { ReactNode } from 'react';
 import type { Web3ModalConfig } from '../hooks/useWeb3Modal';
 import { createContext, useContext, useEffect } from 'react';
 import WalletConnectProvider from '@walletconnect/web3-provider';
-// import Logger from '../utils/logger';
 import { useAppReducer } from './reducer';
+import { assertNonNullish } from '../utils/types';
 
 // Custom hooks
 import { useWeb3Modal } from '../hooks/useWeb3Modal';
@@ -16,9 +16,6 @@ import {
   getNetworksIds,
   getNetworksRpcs
 } from '../config';
-
-// Initialize logger
-// const logger = Logger('Store');
 
 export type AppReducerType = ReturnType<typeof useAppReducer>;
 export type State = AppReducerType[0];
@@ -33,20 +30,14 @@ export interface PropsType {
 
 export const useAppState = () => {
   const ctx = useContext(StateContext);
-
-  if (!ctx) {
-    throw new Error('Missing state context');
-  }
+  assertNonNullish(ctx, 'Missing state context');
 
   return ctx;
 };
 
 export const useAppDispatch = () => {
   const ctx = useContext(DispatchContext);
-
-  if (!ctx) {
-    throw new Error('Missing dispatch context');
-  }
+  assertNonNullish(ctx, 'Missing dispatch context');
 
   return ctx;
 }
@@ -74,7 +65,7 @@ export const AppStateProvider = ({ children }: PropsType) => {
     injectedProvider,
     isConnecting,
     signIn,
-    signOut,
+    logout,
     web3ModalError
   ] = useWeb3Modal(web3ModalConfig);
   const [
@@ -167,10 +158,10 @@ export const AppStateProvider = ({ children }: PropsType) => {
       type: 'SET_WEB3MODAL_FUNCTIONS',
       payload: {
         signIn,
-        signOut
+        logout
       }
     })
-  }, [dispatch, signIn, signOut]);
+  }, [dispatch, signIn, logout]);
 
   useEffect(() => {
     dispatch({

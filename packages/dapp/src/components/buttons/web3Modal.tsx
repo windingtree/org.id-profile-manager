@@ -34,20 +34,20 @@ export const SignInButton = () => {
   )
 };
 
-export const SignOutButton = () => {
+export const LogoutButton = () => {
   const size = useContext(ResponsiveContext);
-  const { isConnecting, signOut } = useAppState();
+  const { isConnecting, logout } = useAppState();
 
   return (
     <Button
-      onClick={() => signOut()}
+      onClick={() => logout()}
       disabled={isConnecting}
     >
       {() => (
         <Box direction='row' align='center' pad='small'>
           {size !== 'small' &&
             <Text>
-              {isConnecting ? 'Connecting' : 'Disconnect'}
+              {isConnecting ? 'Connecting' : 'Logout'}
             </Text>
           }
           {size === 'small' &&
