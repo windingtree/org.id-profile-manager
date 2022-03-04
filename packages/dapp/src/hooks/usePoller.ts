@@ -4,55 +4,52 @@ import Logger from '../utils/logger';
 // Initialize logger
 const logger = Logger('usePoller');
 
+export type PollerContextFunction = () => void | Promise<void>;
+
 // usePoller react hook
 export const usePoller = (
-  fn: Function,
-  delay: number | null,
+  fn: PollerContextFunction,
   enabled = true,
-  name = ' ',
-  maxFailures = 100
-): void => {
+  interval = 5000,
+  pollerName?: string
+) => {
+  if (typeof fn !== 'function') {
+    throw new TypeError('Can\'t poll without a callback function');
+  }
 
-  useEffect(() => {
-    let failures = 0;
+  return useEffect(
+    () => {
+      let disabled = false;
+      let failures = 0;
 
-    const fnRunner = async (): Promise<void> => {
-      try {
-        const context = fn();
-
-        if (typeof context.then === 'function') {
-          await context;
+      const poll = async () => {
+        if (disabled) {
+          return;
         }
-      } catch (error) {
-        failures++;
-        logger.error(
-          `Poller ${name} error: ${(error as Error).message || 'Unknown error'}`
-        );
+
+        try {
+          await fn();
+        } catch (error) {
+          failures++;
+          logger.error(error);
+        }
+
+        if (failures < 100) {
+          setTimeout(poll, interval);
+        } else {
+          logger.debug(`Too much errors in poller ${pollerName}. Disabled`);
+        }
       }
-    };
 
-    const isEnabled = () => enabled && delay && failures < maxFailures;
+      poll();
+      logger.debug(`Poller ${pollerName} started`);
 
-    const poller = async (): Promise<void> => {
-      logger.debug(`Poller ${name} started`);
-
-      while (isEnabled()) {
-        await fnRunner();
-        await new Promise(
-          resolve => setTimeout(resolve, delay !== null ? delay : 0)
-        );
-      }
-    };
-
-    let runnerTimeout: NodeJS.Timeout | undefined;
-
-    if (isEnabled()) {
-      runnerTimeout = setTimeout(poller);
-    }
-
-    return () => {
-      clearTimeout(runnerTimeout as NodeJS.Timeout);
-      logger.debug(`Poller ${name} stopped`);
-    };
-  }, [fn, delay, name, enabled, maxFailures]);
+      return () => {
+        disabled = true;
+        failures = 0;
+        logger.debug(`Poller ${pollerName} stopped`);
+      };
+    },
+    [fn, enabled, interval, pollerName]
+  );
 };
